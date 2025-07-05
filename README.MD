@@ -256,11 +256,11 @@ This is a bachelor thesis project, but suggestions and feedback are welcome:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍🎓 Author
+## 👨‍🎓 Authors
 
 This project was built by Demetre Shonia with help of amazing teammates, Nino Sharvashidze and Giorgi Kochiashvili!
 
-**Bachelor Thesis Project**  
+**Bachelor Thesis Project** 
 _Evaluating Claude Opus 4.0 for Natural Language to Cypher Query Translation_
 
 ---
