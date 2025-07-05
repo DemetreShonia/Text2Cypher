@@ -1,0 +1,826 @@
+Test Case ID,Category,Difficulty,Question,Ground Truth Cypher,Generated Cypher,Syntactic Correct,Execution Success,Semantic Accurate,Manual Override,Final Correctness,Tokens Used,Execution Time (s),Execution Error,Context Used
+1,filtering,easy,What job category has the most jobs?,"match (j:JobTitle)
+return j.category, count(*)
+order by count(*) desc
+limit 1;","MATCH (j:JobTitle)
+WITH j.category AS category, COUNT(j) AS jobCount
+ORDER BY jobCount DESC
+LIMIT 1
+RETURN category, jobCount",True,True,False,True,True,815,8.64,,True
+2,filtering,easy,Which gender is more common?,"match (p:Person)
+with sum(case when toLower(p.gender) = 'male' then 1 else 0 end) as males,
+     sum(case when toLower(p.gender) = 'female' then 1 else 0 end) as females
+return case when males > females then 'males' else females end;","MATCH (p:Person)
+WITH p.gender AS gender, COUNT(p) AS count
+ORDER BY count DESC
+LIMIT 1
+RETURN gender AS moreCommonGender, count AS genderCount",True,True,False,True,True,753,4.64,,True
+3,filtering,easy,What is Mark's nationality?,"match (p:Person)
+where toLower(p.firstName) = 'mark'
+return p.nationality;","MATCH (p:Person {firstName: 'Mark', lastName: 'Johnson'})
+RETURN p.nationality",True,True,True,,True,6510,6.56,,True
+4,filtering,easy,How many people are called Mark?,"match (p:Person)
+where toLower(p.firstName) = 'mark'
+return count(p);","MATCH (p:Person)
+WHERE toLower(p.firstName) = 'mark'
+RETURN count(p) AS markCount",True,True,False,True,True,6685,5.75,,True
+5,filtering,easy,What is the number of population of the world at this moment?,"match (l:Location)
+return sum(l.population)",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: All sub queries in an UNION must have the same return column names (line 7, column 1 (offset: 177))
+""UNION""
+ ^}",False
+6,filtering,easy,Who is Jordan's daddy?,"match (p:Person)-[:IS_CHILD]->(daddy:Person)
+where daddy.gender = 'Male'
+and p.firstName = 'Jordan'
+return daddy.firstName;","MATCH (jordan:Person)-[:IS_CHILD]->(father:Person)
+WHERE toLower(jordan.firstName) = 'jordan' AND father.gender = 'Male'
+RETURN father.firstName + ' ' + father.lastName AS jordansDaddy",True,True,False,True,True,746,10.99,,True
+7,filtering,easy,How many people have a younger sister and are working as a Data Scientist?,"match (person:Person)-[:IS_SIBLING]->(sister:Person)
+where sister.gender = 'Female'
+and sister.birthDate>person.birthDate
+with person
+match (person)-[j:HAD_POSITION]->(jt:JobTitle)
+where toLower(jt.title) = 'data scientist'
+and j.endYear is null
+return count(distinct person)","MATCH (p:Person)-[:IS_SIBLING]->(sister:Person)
+WHERE p.birthDate < sister.birthDate AND sister.gender = 'female'
+WITH p
+MATCH (p)-[w:WORKED_AT]->(c:Company)
+WHERE w.status = 'current'
+WITH p
+MATCH (p)-[h:HAD_POSITION]->(j:JobTitle)
+WHERE h.endYear IS NULL AND toLower(j.title) = 'data scientist'
+RETURN COUNT(DISTINCT p) AS peopleWithYoungerSisterAndDataScientist",True,True,False,True,True,804,8.31,,True
+8,filtering,easy,Where does Mark work?,"match (p:Person)-[worked:WORKED_AT]-(c:Company)
+where toLower(p.firstName) = 'mark'
+and worked.status = 'Current'
+return c.name;","MATCH (p:Person {firstName: 'Mark', lastName: 'Johnson'})-[w:WORKED_AT]->(c:Company)
+WHERE w.status = 'Current'
+RETURN c.name AS CurrentWorkplace",True,True,False,True,True,2931,5.21,,True
+9,filtering,easy,How many people called Mark work in tech industry in spain?,"match (c:Company)-[:WORKED_AT]-(p:Person)-[:LIVES_IN]-(l:Location)
+where toLower(l.country) = 'Spain'
+and toLower(p.firstName) = 'mark'
+and toLower(c.industry) = 'technology'
+return count(distinct p);","MATCH (p:Person)-[:WORKED_AT]->(c:Company)
+WHERE toLower(p.firstName) = 'mark'
+  AND toLower(c.industry) = 'tech'
+  AND toLower(c.headquarters) = 'spain'
+RETURN COUNT(DISTINCT p) AS markCount",True,True,False,,False,757,5.17,,True
+10,filtering,easy,what is most popular girl's name in New Zealand?,"match (p:Person)-[:LIVES_IN]-(loc:Location)
+where loc.country = 'New Zealand'
+and p.gender = 'Female'
+with p.firstName as firstName, count(*) as nameCount
+return firstName, nameCount
+order by nameCount desc
+limit 1;
+","MATCH (p:Person)-[:LIVES_IN]->(l:Location {country: ""New Zealand""})
+WHERE p.gender = ""female""
+WITH LOWER(p.firstName) AS firstName, COUNT(*) AS count
+ORDER BY count DESC
+LIMIT 1
+RETURN firstName AS mostPopularGirlName, count",True,True,False,,False,762,6.54,,True
+11,filtering,easy,How many doctors named Mia are there in New Zealand?,"match (p:Person)-[worked:HAD_POSITION]-(job:JobTitle)
+where p.firstName = 'Mia'
+and job.title = 'Doctor'
+and worked.endYear is null
+return count(distinct p);","MATCH (p:Person)-[:HAD_POSITION]->(j:JobTitle {title: 'Doctor'}),
+      (p)-[:LIVES_IN]->(l:Location {country: 'New Zealand'})
+WHERE toLower(p.firstName) = 'mia'
+RETURN count(DISTINCT p) AS doctorCount",True,True,False,True,True,871,6.03,,True
+12,aggregation,easy,What is the average number of friends among teenagers aged 13 to 39?,"match (teen:Person)
+where (duration.between(date(teen.birthDate),date())).years < 40
+and (duration.between(date(teen.birthDate),date())).years > 12
+optional match (teen)-[:IS_FRIEND]->(friend:Person)
+with count(distinct teen) as totalTeens, count(friend) as totalFriends
+return toFloat(totalFriends)/totalTeens;","MATCH (p:Person)
+WHERE date().year - toInteger(substring(p.birthDate, 0, 4)) >= 13 
+  AND date().year - toInteger(substring(p.birthDate, 0, 4)) <= 39
+WITH p, size((p)-[:IS_FRIEND]-()) AS friendCount
+RETURN avg(friendCount) AS averageFriends",True,False,False,,False,1023,6.3,"{code: Neo.ClientError.Statement.SyntaxError} {message: A pattern expression should only be used in order to test the existence of a pattern. It can no longer be used inside the function size(), an alternative is to replace size() with COUNT {}. (line 4, column 14 (offset: 163))
+""WITH p, size((p)-[:IS_FRIEND]-()) AS friendCount""
+              ^}",True
+13,filtering,easy,"How many Samuels, who are over 20, are friends with 31-year-old Dana?","match (samuel:Person)-[:IS_FRIEND]-(dana:Person)
+where samuel.firstName = 'Samuel'
+and date().year - date(samuel.birthDate).year > 20
+and duration.between(date(dana.birthDate), date()).years = 31
+and dana.firstName = 'Dana'
+return count(distinct samuel);",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.TypeError} {message: Invalid input for function 'toInteger()': Expected a String, Float, Integer or Boolean, got: List{String(""1993-07-14"")}}",False
+14,aggregation,easy,Most popular subject among students at Yemen schools.,"match (f:FieldOfStudy)-[:STUDIED]-(p:Person)-[:STUDIED_AT]-(uni:EducationalInstitution)
+where uni.country = 'Yemen'
+return f.name, count(distinct p)
+order by count(distinct p) desc
+limit 1;
+","MATCH (p:Person)-[:STUDIED_AT]->(e:EducationalInstitution)-[:LOCATED_IN]->(l:Location {country: 'Yemen'})
+MATCH (p)-[:STUDIED]->(f:FieldOfStudy)
+WITH f, COUNT(DISTINCT p) AS studentCount
+ORDER BY studentCount DESC
+LIMIT 1
+RETURN f.name AS mostPopularSubject, studentCount",True,True,False,,False,775,6.6,,True
+15,filtering,easy,"How many people are there named Connie, who have studied Business Administration?","match (p:Person)-[:STUDIED]-(f:FieldOfStudy)
+where toLower(p.firstName) = 'connie'
+and toLower(f.name) = 'business administration'
+return count(p);","MATCH (p:Person)-[:STUDIED]->(fos:FieldOfStudy)
+WHERE toLower(p.firstName) = 'connie' AND toLower(fos.name) = 'business administration'
+RETURN count(DISTINCT p) AS count",True,True,False,True,True,6656,6.73,,True
+16,aggregation,easy,What is the average number of residents in the city?,"match (l:Location)
+return avg(l.population);","MATCH (l:Location {type: 'CITY'})
+WHERE l.population IS NOT NULL
+RETURN avg(l.population) AS averageResidents",True,True,False,,False,734,5.93,,True
+17,filtering,medium,What place has the most people?,"match (p:Person)-[:LIVES_IN]-(l:Location)
+return l.name, count(p)
+order by count(p) desc
+limit 1;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: A pattern expression should only be used in order to test the existence of a pattern. It can no longer be used inside the function size(), an alternative is to replace size() with COUNT {}. (line 2, column 14 (offset: 32))
+""WITH l, size((l)<-[:LIVES_IN]-()) AS population""
+              ^}",False
+18,filtering,medium,In what educational institution do most people study?,"match (p:Person)-[r:STUDIED_AT]->(ei:EducationalInstitution)
+where r.endYear is null
+with ei, count(distinct p) as numberOfStudents
+order by numberOfStudents desc
+limit 1
+return ei.name, numberOfStudents;","MATCH (p:Person)-[s:STUDIED_AT]->(e:EducationalInstitution)
+WITH e, COUNT(DISTINCT p) AS studentCount
+RETURN e.name AS institution, studentCount
+ORDER BY studentCount DESC
+LIMIT 1",True,True,False,,False,4002,5.05,,True
+19,filtering,medium,What was the population increase from the last 100 years in New Zealand?,,,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: All sub queries in an UNION must have the same return column names (line 9, column 1 (offset: 209))
+""UNION""
+ ^}",False
+20,aggregation,medium,What is the average age in New Zealand?,"match (loc:Location)-[:LIVES_IN]-(p:Person)
+where loc.country = 'New Zealand'
+return avg(duration.between(date(p.birthDate), date()).years);
+","MATCH (l:Location {country: ""New Zealand""})<-[:LIVES_IN]-(p:Person)
+WHERE toLower(l.country) = ""new zealand""
+WITH l, p, date().year - toInteger(substring(p.birthDate, 0, 4)) AS age
+RETURN l.name AS location, AVG(age) AS averageAge",True,True,False,,False,830,6.13,,True
+21,aggregation,medium,Is there a correlation between studying abroad and staying there permanently? (assume it's correlated if it's true for more than half of the population),"match (p:Person)-[:STUDIED_AT]-(uni:EducationalInstitution),
+      (p)-[:LIVES_IN]-(live:Location)
+where uni.country <> p.birthPlace
+with count(case when uni.country = live.country then 1 end) as stayed,
+     count(case when uni.country <> live.country then 1 end) as left
+return case when toFloat(stayed)/(stayed+left) > 0.5 then 'correlated' else 'uncorrelated' end;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: Variable `s` not defined (line 10, column 11 (offset: 357))
+""RETURN p, s, e, l, loc, w, c""
+           ^}",False
+22,aggregation,medium,Is there a correlation between studying abroad and returning home? (assume it's correlated if it's true for more than half of the population),"match (p:Person)-[:STUDIED_AT]-(uni:EducationalInstitution),
+      (p)-[:LIVES_IN]-(liveCountry:Location)
+where uni.country <> p.birthPlace
+with count(case when liveCountry = p.birthPlace then 1 end) as returned,
+     count(case when liveCountry <> p.birthPlace then 1 end) as didnt
+return case when toFloat(returned)/(returned+didnt) > 0.5 then 'correlated' else 'uncorrelated' end;","MATCH (p:Person)-[:STUDIED_AT]->(e:EducationalInstitution)
+WHERE p.nationality <> e.country
+WITH p, e
+MATCH (p)-[l:LIVES_IN]->(loc:Location)
+WHERE l.since > e.foundedYear AND loc.country = p.nationality
+WITH count(DISTINCT p) AS studiedAbroadAndReturned
+MATCH (p:Person)
+WITH studiedAbroadAndReturned, count(p) AS totalPopulation
+RETURN 
+  CASE 
+    WHEN toFloat(studiedAbroadAndReturned) / totalPopulation > 0.5 
+    THEN 'There is a correlation between studying abroad and returning home' 
+    ELSE 'There is no correlation between studying abroad and returning home' 
+  END AS result",True,True,False,True,True,876,8.29,,True
+23,aggregation,medium,"Is there a correlation between studying abroad and changing countries again? (assume it's correlated if it's true for more than half of the population)
+","match (p:Person)-[:STUDIED_AT]-(uni:EducationalInstitution),
+      (p)-[:LIVES_IN]-(live:Location)
+where uni.country <> p.birthPlace
+with count(case when live.country = uni.country then 1 end) as stayed,
+     count(case when live.country <> uni.country then 1 end) as changed
+return case when toFloat(changed)/(changed+stayed) > 0.5 then 'correlated' else 'uncorrelated' end;","MATCH (p:Person)-[:STUDIED_AT]->(e:EducationalInstitution)-[:LOCATED_IN]->(studyCountry:Location)
+WITH p, studyCountry
+MATCH (p)-[:LIVED_IN]->(l:Location)
+WHERE l.country <> studyCountry.country
+WITH p, studyCountry, collect(DISTINCT l.country) AS livedCountries
+WHERE size(livedCountries) > 0
+WITH count(p) AS totalStudiedAbroad, 
+     sum(CASE WHEN size(livedCountries) > 1 THEN 1 ELSE 0 END) AS movedAgain
+RETURN 
+    CASE 
+        WHEN totalStudiedAbroad > 0 THEN 
+            CASE 
+                WHEN toFloat(movedAgain) / totalStudiedAbroad > 0.5 
+                THEN 'There is a correlation between studying abroad and changing countries again.' 
+                ELSE 'There is no correlation between studying abroad and changing countries again.' 
+            END 
+        ELSE 'Insufficient data to determine correlation.' 
+    END AS result",True,True,False,,False,1826,9.81,,True
+24,aggregation,medium,Is there a correlation between the email of the person being Yahoo! and that person not working in the tech field? (assume it's correlated if it's true for more than half of the population),"match (p:Person)-[:HAD_POSITION]-(job:JobTitle)
+where toLower(p.email) ends with '@yahoo.com'
+with count(case when job.category = 'Technology' then 1 end) as tech,
+     count(case when job.category <> 'Techonology' then 1 end) as notTech
+return case when tech+notTech = 0 then 'no yahoo mails' when toFloat(tech)/(tech+notTech) > 0.5 then 'correlated' else 'uncorrelated' end;
+",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: A pattern expression should only be used in order to test the existence of a pattern. It can no longer be used inside the function size(), an alternative is to replace size() with COUNT {}. (line 3, column 14 (offset: 74))
+""WITH p, size((p)-[:WORKED_AT]->(:Company {industry: 'Technology'})) = 0 AS notInTech""
+              ^}",False
+25,aggregation,medium,"On average, how many sisters do people called Charles have?","match (charles:Person)
+where charles.firstName = 'Charles'
+optional match (charles)-[:IS_SIBLING]->(sister:Person)
+where sister.gender = 'Female'
+with charles, count(sister) as sisters
+return avg(sisters)
+","MATCH (p:Person)
+WHERE toLower(p.firstName) = 'charles'
+OPTIONAL MATCH (p)-[:IS_SIBLING]->(sibling:Person)
+WHERE sibling.gender = 'Female'
+WITH p, count(sibling) AS sisterCount
+RETURN avg(sisterCount) AS averageSisterCount",True,True,False,True,True,799,6.67,,True
+26,filtering,medium,How many Christophers are there that have or have had a friend named Jessica,"match (christopher:Person)-[:IS_FRIEND]->(jessica:Person)
+where christopher.firstName = 'Christopher'
+and jessica.firstName = 'Jessica'
+return count(distinct christopher);","MATCH (c:Person)-[:IS_FRIEND]-(j:Person)
+WHERE toLower(c.firstName) = 'christopher' AND toLower(j.firstName) = 'jessica'
+RETURN count(DISTINCT c) AS christophersWithJessicaFriend",True,True,False,True,True,892,4.84,,True
+27,filtering,medium,How many people work in the same field they studied in?,"match (f:FieldOfStudy)-[:STUDIED]-(p:Person)-[a:HAD_POSITION]-(job:JobTitle)
+where f.category = job.category
+and a.endYear is null
+return count(distinct(p));","MATCH (p:Person)-[:STUDIED]->(f:FieldOfStudy)
+WITH p, f
+MATCH (p)-[:WORKED_AT]->(c:Company)
+WITH p, f, c
+MATCH (p)-[:HAD_POSITION]->(j:JobTitle)
+WHERE toLower(j.category) = toLower(f.category)
+RETURN COUNT(DISTINCT p) AS peopleWorkingInStudiedField",True,True,False,,False,770,5.51,,True
+28,aggregation,medium,"What percentage of people use their name as their email?
+","match (p:Person)
+with count(p) as totalPeople,
+     count(case when p.email is not null and toLower(p.email) contains toLower(p.firstName) then 1 end) as nameEmail
+return toFloat(nameEmail) / totalPeople * 100;
+","MATCH (p:Person)
+WITH p, toLower(p.firstName + '.' + p.lastName) AS nameEmail, toLower(p.email) AS lowercaseEmail
+WITH COUNT(p) AS totalPeople, SUM(CASE WHEN nameEmail + '@example.com' = lowercaseEmail OR nameEmail + '@example.org' OR nameEmail + '@example.net' THEN 1 ELSE 0 END) AS nameAsEmailCount
+RETURN toFloat(nameAsEmailCount) / totalPeople * 100 AS percentageUsingNameAsEmail",True,False,False,,False,2111,8.32,"{code: Neo.ClientError.Statement.SyntaxError} {message: Type mismatch: expected Boolean but was String (line 3, column 102 (offset: 215))
+""WITH COUNT(p) AS totalPeople, SUM(CASE WHEN nameEmail + '@example.com' = lowercaseEmail OR nameEmail + '@example.org' OR nameEmail + '@example.net' THEN 1 ELSE 0 END) AS nameAsEmailCount""
+                                                                                                      ^}",True
+29,filtering,medium,In which country are the most amount of people named Jordan?,"match (p:Person)-[:LIVES_IN]-(loc:Location)
+where p.firstName = 'Jordan'
+return loc.country, count(p)
+order by count(p)
+limit 1;","MATCH (p:Person)-[:LIVES_IN]->(l:Location)
+WHERE toLower(p.firstName) = 'jordan'
+WITH l.country AS country, COUNT(p) AS count
+ORDER BY count DESC
+LIMIT 1
+RETURN country, count",True,True,False,True,True,753,6.68,,True
+30,filtering,medium,What positions has Connie's sister worked as?,"match (friend:Person)-[:IS_SIBLING]->(sister:Person)-[worked:HAD_POSITION]-(job:JobTitle)
+where toLower(friend.firstName) = 'connie'
+return distinct job.title;","MATCH (p:Person)-[:IS_SIBLING]->(sister:Person)
+WHERE toLower(p.firstName) = 'connie'
+MATCH (sister)-[w:WORKED_AT]->(company:Company)
+MATCH (sister)-[h:HAD_POSITION]->(jobTitle:JobTitle)
+WHERE h.companyId = company.id AND h.startYear = w.startYear
+RETURN DISTINCT jobTitle.title AS Position
+ORDER BY Position",True,True,False,True,True,5936,6.77,,True
+31,aggregation,medium,How many children on average does a parent have in Grenada?,"match (child:Person)-[:IS_CHILD]->(parent:Person)-[:LIVES_IN]-(loc:Location)
+where loc.country = 'Grenada'
+with parent, count(child) as children
+return avg(children);","MATCH (parent:Person)-[:IS_PARENT]->(child:Person)-[:LIVES_IN]->(:Location {country: 'Grenada'})
+WITH parent, COUNT(child) AS childCount
+RETURN AVG(childCount) AS averageChildrenPerParent",True,True,False,False,False,756,5.1,,True
+32,filtering,medium,How many people have studied in universities located in French Southern Territories and have friends who work in finance?,"match (uni:EducationalInstitution)-[:STUDIED_AT]-(p:Person)-[:IS_FRIEND]-(friend:Person)-[:HAD_POSITION]-(job:JobTitle)
+where toLower(uni.country) = 'french southern territories'
+and toLower(job.category) = 'finance'
+return count(distinct p);",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: Variable `u` not defined (line 5, column 24 (offset: 262))
+""WITH DISTINCT p, f, c, u, l""
+                        ^}",False
+33,filtering,medium,How many people have worked in the education industry and is married to someone who lives in Grenada?,"match (job:JobTitle)-[:HAD_POSITION]-(p:Person)-[:IS_WIFE|IS_HUSBAND]->(spouse:Person)-[:LIVES_IN]-(loc:Location)
+where loc.country = 'Grenada'
+and job.category = 'Education'
+return count(distinct p);
+",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: Variable `c` not defined (line 4, column 17 (offset: 202))
+""WITH p, spouse, c, l""
+                 ^}",False
+34,aggregation,hard,How correlated are education and career? (assume it's correlated if it's true for more than half of the population),"match (job:JobTitle)-[:HAD_POSITION]-(p:Person)
+optional match (p)-[:STUDIED_AT]-(uni:EducationalInstitution)
+with count(case when uni.id is not null then 1 end) as studied,
+     count(case when uni.id is null then 1 end) as didnt
+return case when toFloat(studied)/(studied+didnt) > 0.5 then 'correlated' else 'uncorrelated' end;","MATCH (p:Person)-[:STUDIED_AT]->(e:EducationalInstitution)
+MATCH (p)-[:WORKED_AT]->(c:Company)
+MATCH (p)-[:HAD_POSITION]->(j:JobTitle)
+WITH p, e, c, j,
+     toLower(e.type) AS educationType,
+     toLower(j.category) AS jobCategory
+WITH COUNT(DISTINCT p) AS totalPeople,
+     SUM(CASE WHEN educationType = jobCategory THEN 1 ELSE 0 END) AS matchingPeople
+RETURN 
+    CASE 
+        WHEN toFloat(matchingPeople) / toFloat(totalPeople) > 0.5 
+        THEN 'Education and career are correlated' 
+        ELSE 'Education and career are not correlated' 
+    END AS correlation,
+    toFloat(matchingPeople) / toFloat(totalPeople) AS correlationRatio",True,True,False,,False,6752,7.91,,True
+35,graph_recursion,hard,How are Matthew and Theresa related?,"match (matthew:Person), (theresa:Person), p = shortestPath((matthew)-[*]-(theresa))
+where matthew.firstName = 'Matthew'
+and theresa.firstName = 'Theresa'
+return p;",,False,False,False,,False,0,6.34,Error in test case execution: Object of type Path is not JSON serializable,True
+36,graph_recursion,hard,Is it possible to get all people from just one person's friends' friends (and so on)? One of the person's name is Matthew.,"match (n:Person)
+with count(n) as allPeople
+match (p:Person)
+where p.firstName = 'Matthew'
+with allPeople, p
+match (p)-[:IS_FRIEND*0..]-(friend:Person)
+with allPeople, count(distinct friend) as friends
+return case when friends = allPeople then 'Yes' else 'No' end;
+",,False,False,False,,False,0,6.36,"Error in test case execution: Claude API Error: Error code: 529 - {'type': 'error', 'error': {'type': 'overloaded_error', 'message': 'Overloaded'}}",True
+37,graph_recursion,hard,"On average, how many hops does it take from people living in New Zealand to people working in Johnson-Rogers, Hooper PLC, Patterson, Camacho and White, Rogers-Hobbs, or Ruiz Ltd
+","match (kutaiseli:Person)-[:LIVES_IN]-(kutaisi:Location), (maangeli:Person)-[:WORKED_AT]-(maang:Company), path = shortestPath((kutaiseli)-[*]-(maangeli))
+where toLower(kutaisi.country) = 'new zealand'
+and maang.name in ['Johnson-Rogers', 'Hooper PLC', 'Patterson, Camacho and White', 'Rogers-Hobbs', 'Ruiz Ltd']
+and kutaiseli <> maangeli
+return avg(length(path));",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.DatabaseError.Statement.ExecutionFailed} {message: The shortest path algorithm does not work when the start and end nodes are the same. This can happen if you
+perform a shortestPath search after a cartesian product that might have the same start and end nodes for some
+of the rows passed to shortestPath. If you would rather not experience this exception, and can accept the
+possibility of missing results for those rows, disable this in the Neo4j configuration by setting
+`dbms.cypher.forbid_shortestpath_common_nodes` to false. If you cannot accept missing results, and really want the
+shortestPath between two common nodes, then re-write the query using a standard Cypher variable length pattern
+expression followed by ordering by path length and limiting to one result.}",False
+38,aggregation,hard,"Based on country, how many different jobs did a person have on average?","match (p:Person)-[:LIVES_IN]->(loc:Location)
+where loc.country is not null
+optional match (p)-[:HAD_POSITION]->(jt:JobTitle)
+with p, loc.country as countryName, count(distinct jt.title) as numberOfDistinctJobs
+return countryName, avg(numberOfDistinctJobs) as averageDistinctJobsPerPersonInCountry
+order by averageDistinctJobsPerPersonInCountry desc;","MATCH (p:Person)-[:LIVES_IN]->(l:Location)
+WITH p, l.country AS country, size((p)-[:WORKED_AT]->()) AS jobCount
+RETURN country, round(avg(jobCount), 2) AS avgJobs
+ORDER BY avgJobs DESC",True,False,False,,False,1209,6.26,"{code: Neo.ClientError.Statement.SyntaxError} {message: A pattern expression should only be used in order to test the existence of a pattern. It can no longer be used inside the function size(), an alternative is to replace size() with COUNT {}. (line 2, column 36 (offset: 78))
+""WITH p, l.country AS country, size((p)-[:WORKED_AT]->()) AS jobCount""
+                                    ^}",True
+39,aggregation,medium,Find all men who married spouses older than their sisters,"match (sister:Person)<-[:IS_SIBLING]-(man:Person)-[:IS_WIFE|IS_HUSBAND]->(spouse:Person)
+where toLower(sister.gender) = 'female'
+and toLower(man.gender) = 'male'
+and spouse.birthDate < sister.birthDate
+return man.firstName","MATCH (m:Person {gender: 'Male'})-[:IS_HUSBAND]->(w:Person)
+WHERE m.birthDate > w.birthDate
+WITH m, w
+MATCH (m)-[:IS_SIBLING]->(s:Person {gender: 'Female'})
+WHERE m.birthDate < s.birthDate
+RETURN DISTINCT m.firstName, m.lastName, w.firstName AS spouse_firstName, w.lastName AS spouse_lastName, s.firstName AS sister_firstName, s.lastName AS sister_lastName",True,True,False,,False,797,6.73,,True
+40,filtering,easy,Find locations such that more men than women live there.,"match (p:Person)-[:LIVES_IN]-(l:Location)
+with l.name as location, sum(case when toLower(p.gender) = 'male' then 1 else 0 end) as males, sum(case when toLower(p.gender) = 'female' then 1 else 0 end) as females
+where males>females
+return location","MATCH (l:Location)<-[:LIVES_IN]-(p:Person)
+WITH l, COUNT(CASE WHEN p.gender = 'Male' THEN 1 END) AS maleCount,
+     COUNT(CASE WHEN p.gender = 'Female' THEN 1 END) AS femaleCount
+WHERE maleCount > femaleCount
+RETURN l.name AS LocationName, l.country AS Country, maleCount, femaleCount
+ORDER BY maleCount DESC",True,True,False,True,True,3721,6.66,,True
+41,pattern_matching,medium,"Find locations where more men than women live, and display the population of men and women in such places.","match (p:Person)-[:LIVES_IN]-(l:Location)
+with l.name as location, sum(case when toLower(p.gender) = 'male' then 1 else 0 end) as males, sum(case when toLower(p.gender) = 'female' then 1 else 0 end) as females
+where males>females
+return location, males, females;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: A pattern expression should only be used in order to test the existence of a pattern. It can no longer be used inside the function size(), an alternative is to replace size() with COUNT {}. (line 2, column 14 (offset: 32))
+""WITH l, size((l)<-[:LIVES_IN]-(:Person {gender: 'Male'})) AS maleCount,""
+              ^}",False
+42,filtering,medium,Return top 3 education institutions with most foreign students.,"match (p:Person)-[lived:LIVED_IN]-(l:Location)
+order by p, lived.startYear
+with p, collect(l.country)[0] as firstCountry
+match (p)-[:STUDIED_AT]-(e:EducationalInstitution)
+where firstCountry <> e.country
+with e.name as institution, count(*) as foreignStudents
+order by foreignStudents desc
+limit 3
+return institution, foreignStudents;","MATCH (p:Person)-[s:STUDIED_AT]->(ei:EducationalInstitution)
+WHERE toLower(p.nationality) <> toLower(ei.country)
+WITH ei, COUNT(DISTINCT p) AS foreignStudentCount
+ORDER BY foreignStudentCount DESC
+LIMIT 3
+RETURN ei.name AS institutionName, ei.country AS country, foreignStudentCount
+ORDER BY foreignStudentCount DESC",True,True,False,True,True,1671,6.1,,True
+43,filtering,medium,Return education institutions with most foreign students,"match (p:Person)-[lived:LIVED_IN]-(l:Location)
+order by p, lived.startYear
+with p, collect(l.country)[0] as firstCountry
+match (p)-[:STUDIED_AT]-(e:EducationalInstitution)
+where firstCountry <> e.country
+with e.name as institution, count(*) as foreignStudents
+order by foreignStudents desc
+return institution;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: Variable `s` not defined (line 12, column 36 (offset: 390))
+""RETURN ei, foreignStudentCount, p, s""
+                                    ^}",False
+44,pattern_matching,easy,Who's older than their husband?,"match (husband:Person)-[:IS_HUSBAND]->(spouse:Person)
+where husband.birthDate > spouse.birthDate
+return spouse.firstName","MATCH (w:Person)-[:IS_WIFE]->(h:Person)
+WHERE date(w.birthDate) < date(h.birthDate)
+RETURN w.firstName + ' ' + w.lastName AS Wife, h.firstName + ' ' + h.lastName AS Husband, w.birthDate AS WifeBirthDate, h.birthDate AS HusbandBirthDate
+ORDER BY WifeBirthDate",True,True,False,True,True,2375,5.57,,True
+45,filtering,medium,Find the oldest married person in each city.,"match (l:Location)
+where toLower(l.type) = 'city'
+optional match (l)-[:LIVES_IN]-(p:Person)-[:IS_HUSBAND|IS_WIFE]->(spouse:Person)
+with l.name as city, p
+order by city, p.birthDate
+with city, collect(p)[0] as oldestMarriedPerson
+return city, oldestMarriedPerson.firstName","MATCH (p:Person)-[:IS_HUSBAND|IS_WIFE]->(spouse:Person)
+MATCH (p)-[:LIVES_IN]->(city:Location)
+WITH city, p, spouse, p.birthDate AS birthDate
+ORDER BY birthDate
+WITH city, COLLECT({person: p, spouse: spouse, birthDate: birthDate})[0] AS oldestCouple
+RETURN city.name AS City, oldestCouple.person.firstName + ' ' + oldestCouple.person.lastName AS OldestMarriedPerson, oldestCouple.birthDate AS BirthDate, oldestCouple.spouse.firstName + ' ' + oldestCouple.spouse.lastName AS Spouse
+ORDER BY City",True,True,False,True,True,1623,6.92,,True
+46,pattern_matching,hard,Family trees where everyone works.,"match (root)-[:IS_HUSBAND|IS_WIFE|IS_PARENT|IS_CHILD|IS_SIBLING*0..50]-(member:Person)
+with root, collect(distinct member) as familyMembers
+where all(member in familyMembers where exists {
+        (member)-[:WORKED_AT]->(c:Company)
+        })
+and size(familyMembers) > 1
+return root.firstName + ' ' + root.lastName as familyRoot,
+       [member in familyMembers | member.firstName + ' ' + member.lastName] as employedFamilyMembers
+       order by size(familyMembers) desc;",,False,False,False,,False,0,7.77,Error in test case execution: Object of type Node is not JSON serializable,True
+47,filtering,easy,Find isolated individuals.,"match (p:Person)
+where not exists { (p)-[:IS_HUSBAND|IS_WIFE|IS_PARENT|IS_CHILD|IS_SIBLING]-(p2:Person) }
+and not exists { (p)-[:IS_FRIEND]-() }
+return p.firstName;","MATCH (p:Person)
+WHERE NOT EXISTS {
+    (p)-[:IS_FRIEND|WORKED_AT|HAD_POSITION|LIVES_IN|LIVED_IN|IS_HUSBAND|IS_PARENT|STUDIED_AT|STUDIED|IS_WIFE|IS_CHILD|IS_SIBLING]-()
+}
+RETURN p",True,True,True,,True,745,5.38,,True
+48,graph_recursion,hard,Find second cousins.,"match (a:Person)-[:IS_CHILD]->(pa1:Person)-[:IS_CHILD]->(gpa:Person),
+      (b:Person)-[:IS_CHILD]->(pb1:Person)-[:IS_CHILD]->(gpb:Person),
+      (gpa)-[:IS_CHILD]->(ggp:Person)<-[:IS_CHILD]-(gpb)
+where a <> b
+and not (a)-[:IS_CHILD]->(:Person)<-[:IS_CHILD]-(b)
+and not (a)-[:IS_CHILD]->(:Person)-[:IS_CHILD]->(:Person)<-[:IS_CHILD]-(:Person)<-[:IS_CHILD]-(b)
+return a.firstName + ' ' + a.lastName as person1,
+       b.firstName + ' ' + b.lastName as person2
+       order by person1, person2;",,False,False,False,,False,0,6.88,Error in test case execution: Object of type Node is not JSON serializable,True
+49,filtering,medium,Who has more cousins than siblings?,"match (p:Person)
+optional match (p)-[:IS_SIBLING]-(sibling:Person)
+with p, count(distinct sibling) AS siblingCount
+optional match (p)-[:IS_CHILD]->(parent:Person)-[:IS_SIBLING]->(auntOrUncle:Person)<-[:IS_CHILD]-(cousin:Person)
+with p, siblingCount, count(distinct cousin) as cousinCount
+where (cousinCount > siblingCount)
+return p.firstName, siblingCount, cousinCount;","MATCH (p:Person)
+WHERE p.cousinCount > p.siblingCount
+RETURN p.firstName + ' ' + p.lastName AS name, p.cousinCount AS cousins, p.siblingCount AS siblings
+ORDER BY p.cousinCount DESC, p.siblingCount ASC",True,True,False,,False,2625,6.53,,True
+50,paradox,hard,Which siblings studied before being born?,"match (n)
+where 1=2
+return n;","MATCH (p1:Person)-[:IS_SIBLING]-(p2:Person)
+WHERE p1.id < p2.id
+WITH p1, p2
+MATCH (p1)-[s1:STUDIED_AT]->(e:EducationalInstitution)
+MATCH (p2)-[s2:STUDIED_AT]->(e:EducationalInstitution)
+WHERE s1.startYear < toInteger(left(p1.birthDate, 4)) OR s2.startYear < toInteger(left(p2.birthDate, 4))
+RETURN p1.firstName + ' ' + p1.lastName AS Sibling1, p2.firstName + ' ' + p2.lastName AS Sibling2, e.name AS Institution",True,True,True,False,False,807,7.7,,True
+51,filtering,medium,Who's the oldest person without their family?,"match (p:Person)
+where not (p)-[:IS_HUSBAND|IS_WIFE|IS_PARENT|IS_CHILD|IS_SIBLING]-(:Person)
+return p.firstName
+order by p.birthDate
+limit 1;",,False,False,False,,False,0,6.21,Error in test case execution: Object of type Node is not JSON serializable,True
+52,filtering,easy,Who's the youngest person with kids?,"match (p:Person)-[:IS_PARENT]->(c:Person)
+return p.firstName
+order by p.birthDate desc
+limit 1;","MATCH (p:Person)-[:IS_PARENT]->(child:Person)
+WITH p, COUNT(child) AS childCount, COLLECT(child) AS children
+WHERE childCount > 0
+RETURN p.firstName + ' ' + p.lastName AS youngestParent, p.birthDate AS birthDate, childCount, [child IN children | child.firstName + ' ' + child.lastName] AS childrenNames
+ORDER BY date(p.birthDate) DESC
+LIMIT 1",True,True,False,True,True,1612,9.51,,True
+53,aggregation,medium,Who is the most well traveled person?,"match (p:Person)-[:LIVED_IN|LIVES_IN]->(loc:Location)
+with p, count(distinct loc) as locationCount
+order by locationCount desc
+limit 1
+return p.firstName;","MATCH (p:Person)
+WITH p, size((p)-[:LIVED_IN]->()) + size((p)-[:LIVES_IN]->()) AS total_locations
+RETURN p.firstName + ' ' + p.lastName AS most_traveled_person, total_locations
+ORDER BY total_locations DESC
+LIMIT 1",True,False,False,,False,7087,6.53,"{code: Neo.ClientError.Statement.SyntaxError} {message: A pattern expression should only be used in order to test the existence of a pattern. It can no longer be used inside the function size(), an alternative is to replace size() with COUNT {}. (line 2, column 14 (offset: 30))
+""WITH p, size((p)-[:LIVED_IN]->()) + size((p)-[:LIVES_IN]->()) AS total_locations""
+              ^}",True
+54,aggregation,medium,Who is the most popular person with their friends?,"match (p:Person)-[:IS_FRIEND]-(:Person)
+with p, count(*) as friendCount
+order by friendCount desc
+limit 1
+return p.firstName;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: A pattern expression should only be used in order to test the existence of a pattern. It can no longer be used inside the function size(), an alternative is to replace size() with COUNT {}. (line 2, column 14 (offset: 30))
+""WITH p, size((p)-[:IS_FRIEND]->()) AS friendCount""
+              ^}",False
+55,aggregation,medium,Find people who have changed location 3 times.,"match (p:Person)-[:LIVES_IN|LIVED_IN]-(l:Location)
+with p, count(l) as locations
+where locations > 3
+return p.firstName;","MATCH (p:Person)-[r:LIVED_IN]->(l:Location)
+WITH p, COUNT(DISTINCT l) AS locationCount
+WHERE locationCount = 3
+RETURN p.firstName + ' ' + p.lastName AS name",True,True,False,True,True,1052,5.75,,True
+56,Inconclusive,medium,Show people who are friends on Facebook.,"match (n)
+ where 1=2
+return n;","MATCH (p1:Person)-[r:IS_FRIEND]->(p2:Person)
+WHERE toLower(r.since) CONTAINS 'facebook'
+RETURN p1.firstName + ' ' + p1.lastName AS Person1, p2.firstName + ' ' + p2.lastName AS Person2",True,True,True,False,False,750,5.52,,True
+57,filtering,medium,List people whose jobs rhyme with the word preacher.,"match (p:Person)-[:HAD_POSITION]->(jt:JobTitle)
+where toLower(jt.title) ends with 'eacher'
+return distinct p.firstName;","MATCH (p:Person)-[:HAD_POSITION]->(j:JobTitle)
+WHERE toLower(j.title) =~ '.*eacher$'
+RETURN DISTINCT p.firstName, p.lastName, j.title",True,True,False,True,True,6195,5.97,,True
+58,filtering,medium,Find people currently living in a city they were born in.,"match (p:Person)-[:LIVES_IN]->(loc:Location)
+where p.birthPlace = loc.name
+return p.firstName;","MATCH (p:Person)-[:LIVES_IN]->(l:Location)<-[:LIVED_IN]-(p)
+WHERE toLower(p.birthPlace) = toLower(l.name)
+  AND NOT EXISTS((p)-[:LIVED_IN]->(l2:Location) WHERE l2 <> l AND l2.id > l.id)
+RETURN p.firstName, p.lastName, l.name AS currentCity
+ORDER BY p.lastName, p.firstName",True,False,False,,False,776,6.51,"{code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input 'WHERE': expected an expression, ')' or ',' (line 3, column 49 (offset: 154))
+""  AND NOT EXISTS((p)-[:LIVED_IN]->(l2:Location) WHERE l2 <> l AND l2.id > l.id)""
+                                                 ^}",True
+60,filtering,medium,Find siblings who studied the same things.,"match (a:Person)-[:IS_SIBLING]->(b:Person),
+(a)-[:STUDIED]->(fieldA:FieldOfStudy),
+(b)-[:STUDIED]->(fieldB:FieldOfStudy)
+where fieldA.name = fieldB.name
+return distinct a.firstName, b.firstName;","MATCH (p1:Person)-[:IS_SIBLING]->(p2:Person)
+WHERE id(p1) < id(p2)
+WITH p1, p2
+MATCH (p1)-[:STUDIED]->(f:FieldOfStudy)<-[:STUDIED]-(p2)
+RETURN p1.firstName + ' ' + p1.lastName AS Sibling1, 
+       p2.firstName + ' ' + p2.lastName AS Sibling2, 
+       COLLECT(f.name) AS SharedFields
+ORDER BY SIZE(SharedFields) DESC",True,True,True,,True,783,6.4,,True
+61,filtering,medium,Find palindromic first names in the database.,"match (p:Person)
+where toLower(p.firstName) = reverse(toLower(p.firstName))
+return p.firstName;","MATCH (p:Person)
+WHERE toLower(p.firstName) = reverse(toLower(p.firstName))
+RETURN DISTINCT p.firstName AS PalindromicFirstName
+ORDER BY PalindromicFirstName",True,True,False,True,True,6742,6.85,,True
+62,filtering,medium,Find all the people who are both a child and a parent.,"match (child:Person)-[:IS_CHILD]->(p:Person)-[:IS_CHILD]->(parent:Person)
+return distinct p.firstName;","MATCH (p:Person)
+WHERE EXISTS((p)<-[:IS_PARENT]-()) AND EXISTS((p)-[:IS_PARENT]->())
+RETURN p.firstName AS firstName, p.lastName AS lastName, p.id AS id",True,True,False,True,True,2120,4.79,,True
+63,filtering,medium,List people who have both a parent and a child in the graph.,"match (child:Person)-[:IS_CHILD]->(p:Person)-[:IS_CHILD]->(parent:Person)
+return distinct p.firstName;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: A pattern expression should only be used in order to test the existence of a pattern. It should therefore only be used in contexts that evaluate to a boolean, e.g. inside the function exists() or in a WHERE-clause. No other uses are allowed, instead they should be replaced by a pattern comprehension. (line 7, column 8 (offset: 177))
+""       (p)-[:IS_PARENT]->(child),""
+        ^}",False
+64,pattern_matching,medium,Find married couples that live in different cities.,"match (p1:Person)-[:IS_HUSBAND|IS_WIFE]->(p2:Person),
+(p1)-[:LIVES_IN]->(loc1:Location),
+(p2)-[:LIVES_IN]->(loc2:Location)
+where loc1.name <> loc2.name
+and p1.id < p2.id
+return p1.firstName, p2.firstName;","MATCH (p1:Person)-[:IS_HUSBAND|IS_WIFE]->(p2:Person)
+WHERE p1.id < p2.id
+MATCH (p1)-[l1:LIVES_IN]->(loc1:Location)
+MATCH (p2)-[l2:LIVES_IN]->(loc2:Location)
+WHERE loc1.id <> loc2.id
+RETURN p1.firstName + ' ' + p1.lastName AS Partner1, 
+       p2.firstName + ' ' + p2.lastName AS Partner2, 
+       loc1.name AS City1, 
+       loc2.name AS City2",True,True,False,True,True,2880,7.17,,True
+65,graph_recursion,hard,Find all friend groups of 3.,"match (p1:Person)-[:IS_FRIEND]->(p2:Person)-[:IS_FRIEND]->(p3:Person),
+      (p3)-[:IS_FRIEND]->(p1)
+where p1.id < p2.id
+and p2.id < p3.id
+return p1.firstName, p2.firstName, p3.firstName;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: A pattern expression should only be used in order to test the existence of a pattern. It should therefore only be used in contexts that evaluate to a boolean, e.g. inside the function exists() or in a WHERE-clause. No other uses are allowed, instead they should be replaced by a pattern comprehension. (line 6, column 8 (offset: 182))
+""       (p1)-[:IS_FRIEND]->(p2),""
+        ^}",False
+66,filtering,medium,Look for all degrees held by people and count them per degree type.,"match (p:Person)-[r:STUDIED]->(f:FieldOfStudy)
+return r.degree, count(*);","MATCH (p:Person)-[s:STUDIED_AT]->(e:EducationalInstitution)
+WITH DISTINCT p, s.degree AS degree
+RETURN degree, COUNT(p) AS count
+ORDER BY count DESC",True,True,False,False,False,773,5.13,,True
+67,pattern_matching,hard,"Find people with double letter initials, like N.N.","match (p:Person)
+where left(p.firstName, 1) = left(p.lastName, 1)
+return p.firstName, p.lastName;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: Type mismatch: expected List<T> but was String (line 2, column 7 (offset: 23))
+""WHERE toLower(p.firstName)[0] = toLower(p.lastName)[0]""
+       ^}",False
+68,filtering,medium,Find names that are both first names and last names in the database.,"match (p1:Person), (p2:Person)
+where p1.firstName = p2.lastName
+return distinct p1.firstName;","MATCH (p1:Person), (p2:Person)
+WHERE toLower(p1.firstName) = toLower(p2.lastName)
+RETURN DISTINCT p1.firstName AS name
+ORDER BY name",True,True,False,True,True,744,5.43,,True
+69,filtering,medium,Find people who are missing birthdates.,"match (p:Person)
+where p.birthDate is null
+return p.firstName;","MATCH (p:Person)
+WHERE p.birthDate IS NULL
+RETURN p.id, p.firstName, p.lastName",True,True,True,,True,724,5.76,,True
+70,filtering,easy,Which companies were founded in the same year?,"match (c1:Company), (c2:Company)
+where c1.foundedYear = c2.foundedYear
+and c1.id < c2.id
+return c1.name, c2.name;","MATCH (c1:Company), (c2:Company)
+WHERE c1.foundedYear = c2.foundedYear AND id(c1) < id(c2)
+RETURN c1.name AS Company1, c2.name AS Company2, c1.foundedYear AS FoundedYear
+ORDER BY c1.foundedYear",True,True,True,,True,754,6.77,,True
+71,filtering,easy,Show me all universities founded before 1800.,"match (e:EducationalInstitution)
+where e.foundedYear < 1800
+return e.name;","MATCH (u:EducationalInstitution)
+WHERE u.type = 'university' AND u.foundedYear < 1800
+RETURN u.name, u.foundedYear, u.country
+ORDER BY u.foundedYear",True,True,False,,False,742,4.59,,True
+72,pattern_matching,easy,Find people who share the same birthday.,"match (p1:Person), (p2:Person)
+where date(p1.birthDate).month = date(p2.birthDate).month
+and date(p1.birthDate).day = date(p2.birthDate).day
+and p1.id < p2.id
+return p1.firstName, p2.firstName;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: Variable `birthTimestamp` not defined (line 7, column 57 (offset: 312))
+""AND apoc.date.parse(p2.birthDate, 'ms', 'yyyy-MM-dd') = birthTimestamp""
+                                                         ^}",False
+73,filtering,easy,List all job titles in the management category.,"match (j:JobTitle)
+where toLower(j.category) = 'management'
+return j.title;","MATCH (j:JobTitle)
+WHERE toLower(j.category) = 'management'
+RETURN DISTINCT j.title",True,True,True,,True,3766,3.96,,True
+74,filtering,easy,What fields of study belong to the humanities category?,"match (f:FieldOfStudy)
+where toLower(f.category) = 'humanities'
+return f.name;","MATCH (f:FieldOfStudy)
+WHERE toLower(f.category) = 'humanities'
+RETURN DISTINCT f.name AS fieldOfStudy",True,True,False,True,True,2055,4.68,,True
+75,pattern_matching,easy,Find people whose email domain matches their company name.,"match (p:Person)-[:WORKED_AT]-(c:Company)
+where toLower(p.email) contains c.name
+return p.firstName;","MATCH (p:Person)-[:WORKED_AT]->(c:Company)
+WHERE toLower(split(p.email, '@')[1]) CONTAINS toLower(c.name)
+RETURN p.firstName, p.lastName, p.email, c.name",True,True,True,,True,747,4.83,,True
+76,filtering,easy,Show me all cities with population over 1 million.,"match (l:Location)
+where toLower(l.type) = 'city'
+and l.population > 1000000
+return l.name;","MATCH (l:Location)
+WHERE l.type = 'city' AND l.population > 1000000
+RETURN l.name AS City, l.population AS Population
+ORDER BY l.population DESC",True,True,False,,False,743,9.58,,True
+77,filtering,easy,Who graduated from university in 2016?,"match (p:Person)-[s:STUDIED_AT]-(e:EducationalInstitution)
+where s.endYear = 2016
+return p.firstName;","MATCH (p:Person)-[s:STUDIED_AT]->(e:EducationalInstitution)
+WHERE s.endYear = 2016 AND toLower(s.status) = 'graduated'
+RETURN p.firstName + ' ' + p.lastName AS graduateName, e.name AS university",True,True,False,True,True,2774,6.05,,True
+78,aggregation,medium,Which married couples have the biggest age gap?,"match (p1:Person)-[:IS_HUSBAND|IS_WIFE]-(p2:Person)
+with p1, p2, duration.between(date(p2.birthDate), date(p1.birthDate)) as ageGap
+return p1.firstName, p2.firstName
+order by ageGap desc
+limit 1;",,False,False,False,,False,0,7.82,Error in test case execution: Object of type Date is not JSON serializable,True
+79,filtering,medium,Show me people who studied longer than 4 years at university.,"match (p:Person)-[s:STUDIED_AT]-(e:EducationalInstitution)
+where s.endYear - s.startYear > 4
+return p.firstName;","MATCH (p:Person)-[s:STUDIED_AT]->(e:EducationalInstitution)
+WHERE e.type = 'university' AND s.endYear - s.startYear > 4
+RETURN p.firstName + ' ' + p.lastName AS name, e.name AS university, s.startYear, s.endYear, s.endYear - s.startYear AS studyDuration
+ORDER BY studyDuration DESC",True,True,False,,False,780,5.84,,True
+80,pattern_matching,medium,Find friends who work in competing companies in the same industry.,"match (p1:Person)-[w1:WORKED_AT]-(c1:Company),
+      (p2:Person)-[w2:WORKED_AT]-(c2:Company)
+where p1.id < p2.id
+and c1.id <> c2.id
+and c1.industry = c2.industry
+and w1.endYear is null
+and w2.endYear is null
+return p1.firstName, p2.firstName;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: PatternExpressions are not allowed to introduce new variables: 'w1'. (line 11, column 14 (offset: 345))
+""       (p1)-[w1]->(c1),""
+              ^}",False
+81,filtering,medium,Find people who started working before finishing their studies.,"match (e:EducationalInstitution)-[s:STUDIED_AT]-(p:Person)-[w:WORKED_AT]-(c:Company)
+where w.startYear < s.endYear
+return p.firstName;","MATCH (p:Person)-[s:STUDIED_AT]->(e:EducationalInstitution),
+      (p)-[w:WORKED_AT]->(c:Company)
+WHERE w.startYear < s.endYear
+RETURN DISTINCT p.firstName, p.lastName, e.name AS institution, c.name AS company,
+       w.startYear AS workStartYear, s.endYear AS studyEndYear
+ORDER BY p.firstName, p.lastName",True,True,False,True,True,5533,6.05,,True
+82,aggregation,medium,Which field of study has the shortest average study duration?,"match (p:Person)-[s:STUDIED]-(f:FieldOfStudy)
+where s.endYear is not null
+with f, avg(s.endYear - s.startYear) as studyDuration
+return f.name
+order by studyDuration
+limit 1;","MATCH (f:FieldOfStudy)<-[s:STUDIED]-(p:Person)
+WHERE s.startYear IS NOT NULL AND s.endYear IS NOT NULL
+WITH f, AVG(s.endYear - s.startYear) AS avgDuration
+RETURN f.name AS fieldOfStudy, avgDuration
+ORDER BY avgDuration ASC
+LIMIT 1",True,True,False,True,True,3832,5.32,,True
+83,pattern_matching,medium,Show me parent-child pairs who work in the same company.,"match (c:Company)-[w1:WORKED_AT]-(child:Person)-[:IS_CHILD]->(parent:Person)-[w2:WORKED_AT]-(c)
+where w1.endYear is null
+and w2.endYear is null
+return child.firstName, parent.firstName;","MATCH (parent:Person)-[:IS_PARENT]->(child:Person),
+      (parent)-[pw:WORKED_AT]->(company:Company),
+      (child)-[cw:WORKED_AT]->(company)
+WHERE pw.status = 'Current' AND cw.status = 'Current'
+RETURN parent.firstName + ' ' + parent.lastName AS Parent,
+       child.firstName + ' ' + child.lastName AS Child,
+       company.name AS Company",True,True,False,True,True,3131,7.54,,True
+84,graph_recursion,hard,Find family dynasties where multiple generations attended the same university.,"match path = (p1:Person)-[:IS_CHILD*1..5]->(p2:Person),
+      (p1)-[:STUDIED_AT]->(u:EducationalInstitution),
+      (p2)-[:STUDIED_AT]->(u)
+with collect(distinct p1) + collect(distinct p2) as family
+return [p in family | p.firstName];","MATCH (p1:Person)-[:IS_PARENT*1..3]->(p2:Person),
+      (p1)-[:STUDIED_AT]->(uni:EducationalInstitution),
+      (p2)-[:STUDIED_AT]->(uni)
+WHERE toLower(p1.firstName) <> toLower(p2.firstName)
+  AND toLower(p1.lastName) = toLower(p2.lastName)
+RETURN DISTINCT p1.firstName + ' ' + p1.lastName AS parent,
+       p2.firstName + ' ' + p2.lastName AS descendant,
+       uni.name AS university
+ORDER BY parent, descendant, university",True,True,False,,False,1030,6.81,,True
+85,pattern_matching,hard,Detect circular migration patterns where people return to their birth country after living abroad.,"match (p:Person)-[l1:LIVED_IN]->(loc1:Location)
+with p, loc1
+order by p, l1.startYear
+with p, collect(loc1)[0] as origin
+match (p)-[l2:LIVED_IN]->(loc2:Location)
+where loc2.country <> origin.country
+with p, origin, max(l2.startYear) as abroadYear
+match (p)-[l3:LIVES_IN]->(loc3:Location)
+where l3.startYear > abroadYear and loc3.country = origin.country
+return distinct p.firstName;","MATCH (p:Person)-[:LIVED_IN]->(l:Location)
+WHERE l.country <> p.birthPlace
+WITH p, l
+MATCH (p)-[:LIVES_IN]->(current:Location)
+WHERE current.country = p.birthPlace AND current.country <> l.country
+RETURN p.firstName, p.lastName, p.birthPlace, l.country AS foreignCountry, current.country AS currentCountry",True,True,True,,True,795,7.41,,True
+86,pattern_matching,hard,Find anomalies in educational timelines where people studied multiple degrees simultaneously.,"match (f1:FieldOfStudy)-[s1:STUDIED]-(p:Person)-[s2:STUDIED]-(f2:FieldOfStudy)
+where s1.startYear > s2.startYear
+and s1.startYear < s2.endYear
+return p.firstName, s1.degree, s2.degree;",,False,False,False,,False,0,10.63,Error in test case execution: Object of type frozenset is not JSON serializable,True
+87,filtering,easy,Find people who never changed their location.,"match (p:Person)
+where not exists {(p)-[:LIVED_IN]-(l:Location)}
+return p.firstName;","MATCH (p:Person)-[l:LIVES_IN]->(loc:Location)
+WHERE NOT EXISTS((p)-[:LIVED_IN]->(:Location))
+RETURN p.firstName, p.lastName, loc.name
+ORDER BY p.firstName, p.lastName",True,True,False,True,True,2611,5.1,,True
+88,filtering,easy,Which company has the smallest number of employees?,"match (p:Person)-[w:WORKED_AT]-(c:Company)
+where w.endYear is null
+with c, count(distinct p) as workers
+order by workers
+return c.name
+limit 1;","MATCH (c:Company)
+WITH c
+ORDER BY c.employees ASC
+LIMIT 1
+RETURN c.name AS CompanyName, c.employees AS NumberOfEmployees",True,True,False,True,True,938,5.1,,True
+89,filtering,easy,Show me all people with Gmail email addresses.,"match (p:Person)
+where toLower(p.email) contains 'gmail'
+return p.firstName, p.email;","MATCH (p:Person)
+WHERE p.email CONTAINS '@gmail.com'
+RETURN p",True,True,True,,True,721,4.54,,True
+90,filtering,easy,Find all educational institutions of type 'College'.,"match (e:EducationalInstitution)
+where toLower(e.type) = 'college'
+return e.name;","MATCH (ei:EducationalInstitution)
+WHERE ei.type = 'College'
+RETURN ei.name, ei.country, ei.foundedYear
+ORDER BY ei.name",True,True,False,True,True,3398,4.58,,True
+91,filtering,easy,List people who are currently unemployed.,"match (p:Person)
+where not exists {(p)-[w:WORKED_AT]-(c:Company)
+                   where w.endYear is null}
+return p.firstName, p.lastName;","MATCH (p:Person)
+WHERE NOT EXISTS((p)-[:WORKED_AT]->(:Company {status: 'current'}))
+  AND NOT EXISTS((p)-[:HAD_POSITION]->(:JobTitle) WHERE p.HAD_POSITION.endYear IS NULL)
+RETURN p.firstName, p.lastName, p.id",True,False,False,,False,824,6.45,"{code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input 'WHERE': expected an expression, ')' or ',' (line 3, column 51 (offset: 134))
+""  AND NOT EXISTS((p)-[:HAD_POSITION]->(:JobTitle) WHERE p.HAD_POSITION.endYear IS NULL)""
+                                                   ^}",True
+92,filtering,easy,Which field of study has the most students enrolled?,"match (p:Person)-[s:STUDIED]-(f:FieldOfStudy)
+where s.endYear is null
+with f, count(p) as enrolled
+order by enrolled desc
+return f.name
+limit 1;","MATCH (f:FieldOfStudy)<-[:STUDIED]-(p:Person)
+WITH f, COUNT(DISTINCT p) AS studentCount
+RETURN f.name AS fieldOfStudy, studentCount
+ORDER BY studentCount DESC
+LIMIT 1",True,True,False,,False,5051,5.38,,True
+93,pattern_matching,medium,Find people born in the same decade.,"match (p1:Person), (p2:Person)
+where p1.id < p2.id
+and toInteger(date(p1.birthDate).year / 10) = toInteger(date(p2.birthDate).year / 10)
+return p1.firstName, p2.firstName, p1.birthDate, p2.birthDate;","MATCH (p1:Person), (p2:Person)
+WHERE p1 <> p2
+  AND toInteger(substring(p1.birthDate, 0, 4)) / 10 * 10 = toInteger(substring(p2.birthDate, 0, 4)) / 10 * 10
+RETURN p1.firstName + ' ' + p1.lastName AS Person1,
+       p2.firstName + ' ' + p2.lastName AS Person2,
+       toInteger(substring(p1.birthDate, 0, 4)) / 10 * 10 AS Decade
+ORDER BY Decade, Person1, Person2",True,True,False,,False,1775,6.87,,True
+94,filtering,easy,Which locations are classified as 'City' type?,"match (l:Location)
+where toLower(l.type) = 'city'
+return l.name;","MATCH (l:Location)
+WHERE l.type = 'City'
+RETURN l.name, l.country, l.population",True,True,False,True,True,3852,5.33,,True
+95,filtering,easy,Find companies founded in the 21st century.,"match (c:Company)
+where c.foundedYear > 2000
+return c.name;","MATCH (c:Company)
+WHERE c.foundedYear >= 2000
+RETURN c.name AS CompanyName, c.foundedYear AS FoundedYear
+ORDER BY c.foundedYear DESC",True,True,False,True,True,1724,5.51,,True
+96,aggregation,medium,Which industry has the highest average company founding year?,"match (c:Company)
+with c.industry as industry, avg(c.foundedYear) as averageFunded
+return industry
+order by averageFunded desc
+limit 1;",,False,False,False,,False,0,0.0,"Context retrieval failed: {code: Neo.ClientError.Statement.SyntaxError} {message: Invalid use of aggregating function collect(...) in this context (line 6, column 21 (offset: 159))
+""WHERE c.industry IN COLLECT(industry)""
+                     ^}",False
+97,filtering,medium,Find friends who have never lived in the same location at the same time.,"match (p1:Person)-[:IS_FRIEND]-(p2:Person)
+where p1.id < p2.id
+and not exists {(p1)-[:LIVES_IN]-(:Location)-[:LIVES_IN]-(p2)}
+and not exists {(p1)-[l1:LIVED_IN|LIVES_IN]-(:Location)-[l2:LIVED_IN|LIVES_IN]-(p2)
+               where coalesce(l1.endYear, date().year) > l2.startYear
+               and coalesce(l2.endYear, date().year) > l1.startYear}
+return distinct p1.firstName, p2.firstName;","MATCH (p1:Person)-[:IS_FRIEND]-(p2:Person)
+WHERE id(p1) < id(p2)
+WITH p1, p2
+MATCH (p1)-[l1:LIVED_IN]->(loc:Location)
+WITH p1, p2, collect({loc: loc, start: l1.startYear, end: l1.endYear}) AS p1Locations
+MATCH (p2)-[l2:LIVED_IN]->(loc:Location)
+WITH p1, p2, p1Locations, collect({loc: loc, start: l2.startYear, end: l2.endYear}) AS p2Locations
+WHERE NONE(loc1 IN p1Locations WHERE ANY(loc2 IN p2Locations WHERE 
+    loc1.loc = loc2.loc AND 
+    ((loc1.start <= loc2.start AND loc1.end >= loc2.start) OR
+     (loc2.start <= loc1.start AND loc2.end >= loc1.start))
+))
+RETURN p1.firstName + ' ' + p1.lastName AS Person1, p2.firstName + ' ' + p2.lastName AS Person2",True,True,False,,False,10309,10.68,,True
+98,filtering,easy,What is the most common birth month?,"match (p:Person)
+with date(p.birthDate).month as birthMonth, count(*) as born
+order by born desc
+return birthMonth
+limit 1;","MATCH (p:Person)
+WITH split(p.birthDate, '-')[1] AS birthMonth, count(*) AS monthCount
+ORDER BY monthCount DESC, birthMonth
+RETURN birthMonth
+LIMIT 1",True,True,False,True,True,857,4.33,,True
+99,filtering,easy,How many people have the same first and last name?,"match (p:Person)
+where p.firstName = p.lastName
+return count(p);","MATCH (p1:Person), (p2:Person)
+WHERE p1 <> p2 AND toLower(p1.firstName) = toLower(p2.firstName) AND toLower(p1.lastName) = toLower(p2.lastName)
+WITH count(DISTINCT p1) AS sameNameCount
+RETURN sameNameCount",True,True,False,True,True,758,5.22,,True
+100,paradox,easy,How many people were born on the sun?,"match (n)
+where 1=2
+return n;","MATCH (p:Person)
+WHERE toLower(p.birthPlace) = 'sun'
+RETURN count(p) AS peopleFromSun",True,True,False,,False,1385,4.52,,True
