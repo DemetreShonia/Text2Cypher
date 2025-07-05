@@ -1,0 +1,4690 @@
+[
+  {
+    "id": "1",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "What job category has the most jobs?",
+    "ground_truth_cypher": "match (j:JobTitle)\nreturn j.category, count(*)\norder by count(*) desc\nlimit 1;",
+    "expected_results": [
+      {
+        "j.category": "Technology",
+        "count(j)": 3
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:43:50",
+    "tags": []
+  },
+  {
+    "id": "2",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Which gender is more common?",
+    "ground_truth_cypher": "match (j:JobTitle)\nreturn j.category, count(j)\norder by count(j) desc\nlimit 1;",
+    "expected_results": [
+      {
+        "p.gender": "Male",
+        "count(p)": 30
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:45:25",
+    "tags": []
+  },
+  {
+    "id": "3",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "What is Mark's nationality?",
+    "ground_truth_cypher": "match (p:Person)\nwhere toLower(p.firstName) = 'mark'\nreturn p.nationality;",
+    "expected_results": [
+      {
+        "p.nationality": "British"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:46:49",
+    "tags": []
+  },
+  {
+    "id": "4",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "How many people are called Mark?",
+    "ground_truth_cypher": "match (p:Person)\nwhere toLower(p.firstName) = 'mark'\nreturn count(p);",
+    "expected_results": [
+      {
+        "count(p)": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:47:49",
+    "tags": []
+  },
+  {
+    "id": "5",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "What is the number of population of the world at this moment?",
+    "ground_truth_cypher": "match (l:Location)\nreturn sum(l.population)",
+    "expected_results": [
+      {
+        "count(p)": 81917893
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:48:43",
+    "tags": []
+  },
+  {
+    "id": "6",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Who is Jordan's daddy?",
+    "ground_truth_cypher": "match (p:Person)-[:IS_CHILD]->(daddy:Person)\nwhere daddy.gender = 'Male'\nand p.firstName = 'Jordan'\nreturn daddy.firstName;",
+    "expected_results": [
+      {
+        "daddy.firstName": "Joseph"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:49:27",
+    "tags": []
+  },
+  {
+    "id": "7",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "How many people have a younger sister and are working as a Data Scientist?",
+    "ground_truth_cypher": "match (person:Person)-[:IS_SIBLING]->(sister:Person)\nwhere sister.gender = 'Female'\nand sister.birthDate>person.birthDate\nwith person\nmatch (person)-[j:HAD_POSITION]->(jt:JobTitle)\nwhere toLower(jt.title) = 'data scientist'\nand j.endYear is null\nreturn count(distinct person)",
+    "expected_results": [
+      {
+        "count(distinct person)": "0"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:50:13",
+    "tags": []
+  },
+  {
+    "id": "8",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Where does Mark work?",
+    "ground_truth_cypher": "match (p:Person)-[worked:WORKED_AT]-(c:Company)\nwhere toLower(p.firstName) = 'mark'\nand worked.status = 'Current'\nreturn c.name;",
+    "expected_results": [
+      {
+        "c.name": "Johnson-Rogers"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:51:16",
+    "tags": []
+  },
+  {
+    "id": "9",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "How many people called Mark work in tech industry in spain?",
+    "ground_truth_cypher": "match (c:Company)-[:WORKED_AT]-(p:Person)-[:LIVES_IN]-(l:Location)\nwhere toLower(l.country) = 'Spain'\nand toLower(p.firstName) = 'mark'\nand toLower(c.industry) = 'technology'\nreturn count(distinct p);",
+    "expected_results": [
+      {
+        "count(distinct p)": 0
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:52:21",
+    "tags": []
+  },
+  {
+    "id": "10",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "what is most popular girl's name in New Zealand?",
+    "ground_truth_cypher": "match (p:Person)-[:LIVES_IN]-(loc:Location)\nwhere loc.country = 'New Zealand'\nand p.gender = 'Female'\nwith p.firstName as firstName, count(*) as nameCount\nreturn firstName, nameCount\norder by nameCount desc\nlimit 1;\n",
+    "expected_results": [
+      {
+        "firstName": "Mia",
+        "nameCount": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:53:34",
+    "tags": []
+  },
+  {
+    "id": "11",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "How many doctors named Mia are there in New Zealand?",
+    "ground_truth_cypher": "match (p:Person)-[worked:HAD_POSITION]-(job:JobTitle)\nwhere p.firstName = 'Mia'\nand job.title = 'Doctor'\nand worked.endYear is null\nreturn count(distinct p);",
+    "expected_results": [
+      {
+        "count(distinct p)": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:54:26",
+    "tags": []
+  },
+  {
+    "id": "12",
+    "category": "aggregation",
+    "difficulty": "easy",
+    "natural_language_query": "What is the average number of friends among teenagers aged 13 to 39?",
+    "ground_truth_cypher": "match (teen:Person)\nwhere (duration.between(date(teen.birthDate),date())).years < 40\nand (duration.between(date(teen.birthDate),date())).years > 12\noptional match (teen)-[:IS_FRIEND]->(friend:Person)\nwith count(distinct teen) as totalTeens, count(friend) as totalFriends\nreturn toFloat(totalFriends)/totalTeens;",
+    "expected_results": [
+      {
+        "toFloat(totalFriends)/totalTeens": 6.545454545454546
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:55:44",
+    "tags": []
+  },
+  {
+    "id": "13",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "How many Samuels, who are over 20, are friends with 31-year-old Dana?",
+    "ground_truth_cypher": "match (samuel:Person)-[:IS_FRIEND]-(dana:Person)\nwhere samuel.firstName = 'Samuel'\nand date().year - date(samuel.birthDate).year > 20\nand duration.between(date(dana.birthDate), date()).years = 31\nand dana.firstName = 'Dana'\nreturn count(distinct samuel);",
+    "expected_results": [
+      {
+        "count(distinct samuel)": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:56:48",
+    "tags": []
+  },
+  {
+    "id": "14",
+    "category": "aggregation",
+    "difficulty": "easy",
+    "natural_language_query": "Most popular subject among students at Yemen schools.",
+    "ground_truth_cypher": "match (f:FieldOfStudy)-[:STUDIED]-(p:Person)-[:STUDIED_AT]-(uni:EducationalInstitution)\nwhere uni.country = 'Yemen'\nreturn f.name, count(distinct p)\norder by count(distinct p) desc\nlimit 1;\n",
+    "expected_results": [
+      {
+        "f.name": "Business Administration",
+        "count(distinct p)": 3
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:57:35",
+    "tags": []
+  },
+  {
+    "id": "15",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "How many people are there named Connie, who have studied Business Administration?",
+    "ground_truth_cypher": "match (p:Person)-[:STUDIED]-(f:FieldOfStudy)\nwhere toLower(p.firstName) = 'connie'\nand toLower(f.name) = 'business administration'\nreturn count(p);",
+    "expected_results": [
+      {
+        "count(distinct p)": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 14:58:30",
+    "tags": []
+  },
+  {
+    "id": "16",
+    "category": "aggregation",
+    "difficulty": "easy",
+    "natural_language_query": "What is the average number of residents in the country?",
+    "ground_truth_cypher": "match (l:Location)\nreturn avg(l.population);",
+    "expected_results": [
+      {
+        "avg(l.population)": 8191789.300000001
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:00:38",
+    "tags": []
+  },
+  {
+    "id": "17",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "What place has the most people?",
+    "ground_truth_cypher": "match (p:Person)-[:LIVES_IN]-(l:Location)\nreturn l.name, count(p)\norder by count(p) desc\nlimit 1;",
+    "expected_results": [
+      {
+        "l.name": "Rivasside",
+        "count(p)": 8
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:01:49",
+    "tags": []
+  },
+  {
+    "id": "18",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "In what educational institution do most people study?",
+    "ground_truth_cypher": "match (p:Person)-[r:STUDIED_AT]->(ei:EducationalInstitution)\nwhere r.endYear is null\nwith ei, count(distinct p) as numberOfStudents\norder by numberOfStudents desc\nlimit 1\nreturn ei.name, numberOfStudents;",
+    "expected_results": [
+      {
+        "ei.name": "Port Nicoleshire Institute",
+        "numberOfStudents": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:03:14",
+    "tags": []
+  },
+  {
+    "id": "19",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "What was the population increase from the last 100 years in New Zealand?",
+    "ground_truth_cypher": "",
+    "expected_results": [{}],
+    "explanation": "",
+    "created_at": "2025-05-15 15:06:38",
+    "tags": []
+  },
+  {
+    "id": "20",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "What is the average age in New Zealand?",
+    "ground_truth_cypher": "match (loc:Location)-[:LIVES_IN]-(p:Person)\nwhere loc.country = 'New Zealand'\nreturn avg(duration.between(date(p.birthDate), date()).years);\n",
+    "expected_results": [
+      {
+        "avg(date().year-date(p.birthDate).year)": 65.8
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:08:24",
+    "tags": []
+  },
+  {
+    "id": "21",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Is there a correlation between studying abroad and staying there permanently? (assume it's correlated if it's true for more than half of the population)",
+    "ground_truth_cypher": "match (p:Person)-[:STUDIED_AT]-(uni:EducationalInstitution),\n      (p)-[:LIVES_IN]-(live:Location)\nwhere uni.country <> p.birthPlace\nwith count(case when uni.country = live.country then 1 end) as stayed,\n     count(case when uni.country <> live.country then 1 end) as left\nreturn case when toFloat(stayed)/(stayed+left) > 0.5 then 'correlated' else 'uncorrelated' end;",
+    "expected_results": [
+      {
+        "case when toFloat(stayed)/(stayed+left) > 0.5 then 'correlated' else 'uncorrelated' end": "uncorrelated"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:09:27",
+    "tags": []
+  },
+  {
+    "id": "22",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Is there a correlation between studying abroad and returning home? (assume it's correlated if it's true for more than half of the population)",
+    "ground_truth_cypher": "match (p:Person)-[:STUDIED_AT]-(uni:EducationalInstitution),\n      (p)-[:LIVES_IN]-(liveCountry:Location)\nwhere uni.country <> p.birthPlace\nwith count(case when liveCountry = p.birthPlace then 1 end) as returned,\n     count(case when liveCountry <> p.birthPlace then 1 end) as didnt\nreturn case when toFloat(returned)/(returned+didnt) > 0.5 then 'correlated' else 'uncorrelated' end;",
+    "expected_results": [
+      {
+        "case when toFloat(returned)/(returned+didnt) > 0.5 then 'correlated' else 'uncorrelated' end": "uncorrelated"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:10:08",
+    "tags": []
+  },
+  {
+    "id": "23",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Is there a correlation between studying abroad and changing countries again? (assume it's correlated if it's true for more than half of the population)\n",
+    "ground_truth_cypher": "match (p:Person)-[:STUDIED_AT]-(uni:EducationalInstitution),\n      (p)-[:LIVES_IN]-(live:Location)\nwhere uni.country <> p.birthPlace\nwith count(case when live.country = uni.country then 1 end) as stayed,\n     count(case when live.country <> uni.country then 1 end) as changed\nreturn case when toFloat(changed)/(changed+stayed) > 0.5 then 'correlated' else 'uncorrelated' end;",
+    "expected_results": [
+      {
+        "case when toFloat(changed)/(changed+stayed) > 0.5 then 'correlated' else 'uncorrelated' end": "correlated"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:10:45",
+    "tags": []
+  },
+  {
+    "id": "24",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Is there a correlation between the email of the person being Yahoo! and that person not working in the tech field? (assume it's correlated if it's true for more than half of the population)",
+    "ground_truth_cypher": "match (p:Person)-[:HAD_POSITION]-(job:JobTitle)\nwhere toLower(p.email) ends with '@yahoo.com'\nwith count(case when job.category = 'Technology' then 1 end) as tech,\n     count(case when job.category <> 'Techonology' then 1 end) as notTech\nreturn case when tech+notTech = 0 then 'no yahoo mails' when toFloat(tech)/(tech+notTech) > 0.5 then 'correlated' else 'uncorrelated' end;\n",
+    "expected_results": [
+      {
+        "case when tech+notTech = 0 then 'no yahoo mails' when toFloat(tech)/(tech+notTech) > 0.5 then 'correlated' else 'uncorrelated' end": "no yahoo mails"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:11:21",
+    "tags": []
+  },
+  {
+    "id": "25",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "On average, how many sisters do people called Charles have?",
+    "ground_truth_cypher": "match (charles:Person)\nwhere charles.firstName = 'Charles'\noptional match (charles)-[:IS_SIBLING]->(sister:Person)\nwhere sister.gender = 'Female'\nwith charles, count(sister) as sisters\nreturn avg(sisters)\n",
+    "expected_results": [
+      {
+        "avg(sisters)": 2.0
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:12:05",
+    "tags": []
+  },
+  {
+    "id": "26",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "How many Christophers are there that have or have had a friend named Jessica",
+    "ground_truth_cypher": "match (christopher:Person)-[:IS_FRIEND]->(jessica:Person)\nwhere christopher.firstName = 'Christopher'\nand jessica.firstName = 'Jessica'\nreturn count(distinct christopher);",
+    "expected_results": [
+      {
+        "count(distinct christopher)": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:12:51",
+    "tags": []
+  },
+  {
+    "id": "27",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "How many people work in the same field they studied in?",
+    "ground_truth_cypher": "match (f:FieldOfStudy)-[:STUDIED]-(p:Person)-[a:HAD_POSITION]-(job:JobTitle)\nwhere f.category = job.category\nand a.endYear is null\nreturn count(distinct(p));",
+    "expected_results": [
+      {
+        "count(distinct(p))": 0
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:13:28",
+    "tags": []
+  },
+  {
+    "id": "28",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "What percentage of people use their name as their email?\n",
+    "ground_truth_cypher": "match (p:Person)\nwith count(p) as totalPeople,\n     count(case when p.email is not null and toLower(p.email) contains toLower(p.firstName) then 1 end) as nameEmail\nreturn toFloat(nameEmail) / totalPeople * 100;\n",
+    "expected_results": [
+      {
+        "toFloat(nameEmail) / totalPeople * 100": 0.0
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:14:12",
+    "tags": []
+  },
+  {
+    "id": "29",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "In which country are the most amount of people named Jordan?",
+    "ground_truth_cypher": "match (p:Person)-[:LIVES_IN]-(loc:Location)\nwhere p.firstName = 'Jordan'\nreturn loc.country, count(p)\norder by count(p)\nlimit 1;",
+    "expected_results": [
+      {
+        "loc.country": "Kazakhstan",
+        "count(p)": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:16:04",
+    "tags": []
+  },
+  {
+    "id": "30",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "What positions has Connie's sister worked as?",
+    "ground_truth_cypher": "match (friend:Person)-[:IS_SIBLING]->(sister:Person)-[worked:HAD_POSITION]-(job:JobTitle)\nwhere toLower(friend.firstName) = 'connie'\nreturn distinct job.title;",
+    "expected_results": [
+      {
+        "job.title": "Lawyer"
+      },
+      {
+        "job.title": "Teacher"
+      },
+      {
+        "job.title": "CTO"
+      },
+      {
+        "job.title": "Data Scientist"
+      },
+      {
+        "job.title": "Doctor"
+      },
+      {
+        "job.title": "CTO"
+      },
+      {
+        "job.title": "Teacher"
+      },
+      {
+        "job.title": "Manager"
+      },
+      {
+        "job.title": "CTO"
+      },
+      {
+        "job.title": "Director"
+      },
+      {
+        "job.title": "Manager"
+      },
+      {
+        "job.title": "Director"
+      },
+      {
+        "job.title": "Professor"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:17:15",
+    "tags": []
+  },
+  {
+    "id": "31",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "How many children on average does a parent have in Grenada?",
+    "ground_truth_cypher": "match (child:Person)-[:IS_CHILD]->(parent:Person)-[:LIVES_IN]-(loc:Location)\nwhere loc.country = 'Grenada'\nwith parent, count(child) as children\nreturn avg(children);",
+    "expected_results": [
+      {
+        "avg(children)": 2.0
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:18:10",
+    "tags": []
+  },
+  {
+    "id": "32",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "How many people have studied in universities located in French Southern Territories and have friends who work in finance?",
+    "ground_truth_cypher": "match (uni:EducationalInstitution)-[:STUDIED_AT]-(p:Person)-[:IS_FRIEND]-(friend:Person)-[:HAD_POSITION]-(job:JobTitle)\nwhere toLower(uni.country) = 'french southern territories'\nand toLower(job.category) = 'finance'\nreturn count(distinct p);",
+    "expected_results": [
+      {
+        "count(distinct p)": 8
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:19:34",
+    "tags": []
+  },
+  {
+    "id": "33",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "How many people have worked in the education industry and is married to someone who lives in Grenada?",
+    "ground_truth_cypher": "match (job:JobTitle)-[:HAD_POSITION]-(p:Person)-[:IS_WIFE|IS_HUSBAND]->(spouse:Person)-[:LIVES_IN]-(loc:Location)\nwhere loc.country = 'Grenada'\nand job.category = 'Education'\nreturn count(distinct p);\n",
+    "expected_results": [
+      {
+        "count(distinct p)": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:20:19",
+    "tags": []
+  },
+  {
+    "id": "34",
+    "category": "aggregation",
+    "difficulty": "hard",
+    "natural_language_query": "How correlated are education and career? (assume it's correlated if it's true for more than half of the population)",
+    "ground_truth_cypher": "match (job:JobTitle)-[:HAD_POSITION]-(p:Person)\noptional match (p)-[:STUDIED_AT]-(uni:EducationalInstitution)\nwith count(case when uni.id is not null then 1 end) as studied,\n     count(case when uni.id is null then 1 end) as didnt\nreturn case when toFloat(studied)/(studied+didnt) > 0.5 then 'correlated' else 'uncorrelated' end;",
+    "expected_results": [
+      {
+        "case when toFloat(studied)/(studied+didnt) > 0.5 then 'correlated' else 'uncorrelated' end": "correlated"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:22:01",
+    "tags": []
+  },
+  {
+    "id": "35",
+    "category": "graph_recursion",
+    "difficulty": "hard",
+    "natural_language_query": "How are Matthew and Theresa related?",
+    "ground_truth_cypher": "match (matthew:Person), (theresa:Person), p = shortestPath((matthew)-[*]-(theresa))\nwhere matthew.firstName = 'Matthew'\nand theresa.firstName = 'Theresa'\nreturn p;",
+    "expected_results": [
+      {
+        "p": {
+          "start": {
+            "identity": 45,
+            "labels": ["Person"],
+            "properties": {
+              "birthPlace": "Lowehaven",
+              "firstName": "Matthew",
+              "lastName": "Marshall",
+              "gender": "Male",
+              "nationality": "Australian",
+              "id": "p46",
+              "birthDate": "1945-06-20",
+              "email": "yleon@example.net"
+            },
+            "elementId": "4:9cc3ce49-71b7-4d37-9253-263f386a1087:45"
+          },
+          "end": {
+            "identity": 34,
+            "labels": ["Person"],
+            "properties": {
+              "birthPlace": "New Barry",
+              "firstName": "Theresa",
+              "lastName": "Vazquez",
+              "gender": "Female",
+              "nationality": "Australian",
+              "id": "p35",
+              "birthDate": "1933-03-03",
+              "email": "brandi26@example.org"
+            },
+            "elementId": "4:9cc3ce49-71b7-4d37-9253-263f386a1087:34"
+          },
+          "segments": [
+            {
+              "start": {
+                "identity": 45,
+                "labels": ["Person"],
+                "properties": {
+                  "birthPlace": "Lowehaven",
+                  "firstName": "Matthew",
+                  "lastName": "Marshall",
+                  "gender": "Male",
+                  "nationality": "Australian",
+                  "id": "p46",
+                  "birthDate": "1945-06-20",
+                  "email": "yleon@example.net"
+                },
+                "elementId": "4:9cc3ce49-71b7-4d37-9253-263f386a1087:45"
+              },
+              "relationship": {
+                "identity": 6928788026709508130,
+                "start": 45,
+                "end": 34,
+                "type": "IS_FRIEND",
+                "properties": {
+                  "since": "2010-05-06"
+                },
+                "elementId": "5:9cc3ce49-71b7-4d37-9253-263f386a1087:6928788026709508130",
+                "startNodeElementId": "4:9cc3ce49-71b7-4d37-9253-263f386a1087:45",
+                "endNodeElementId": "4:9cc3ce49-71b7-4d37-9253-263f386a1087:34"
+              },
+              "end": {
+                "identity": 34,
+                "labels": ["Person"],
+                "properties": {
+                  "birthPlace": "New Barry",
+                  "firstName": "Theresa",
+                  "lastName": "Vazquez",
+                  "gender": "Female",
+                  "nationality": "Australian",
+                  "id": "p35",
+                  "birthDate": "1933-03-03",
+                  "email": "brandi26@example.org"
+                },
+                "elementId": "4:9cc3ce49-71b7-4d37-9253-263f386a1087:34"
+              }
+            }
+          ],
+          "length": 1.0
+        }
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:24:08",
+    "tags": []
+  },
+  {
+    "id": "36",
+    "category": "graph_recursion",
+    "difficulty": "hard",
+    "natural_language_query": "Is it possible to get all people from just one person's friends' friends (and so on)? One of the person's name is Matthew.",
+    "ground_truth_cypher": "match (n:Person)\nwith count(n) as allPeople\nmatch (p:Person)\nwhere p.firstName = 'Matthew'\nwith allPeople, p\nmatch (p)-[:IS_FRIEND*0..]-(friend:Person)\nwith allPeople, count(distinct friend) as friends\nreturn case when friends = allPeople then 'Yes' else 'No' end;\n",
+    "expected_results": [
+      {
+        "case when friends = allPeople then 'Yes' else 'No' end": "Yes"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:24:57",
+    "tags": []
+  },
+  {
+    "id": "37",
+    "category": "graph_recursion",
+    "difficulty": "hard",
+    "natural_language_query": "On average, how many hops does it take from people living in New Zealand to people working in Johnson-Rogers, Hooper PLC, Patterson, Camacho and White, Rogers-Hobbs, or Ruiz Ltd\n",
+    "ground_truth_cypher": "match (kutaiseli:Person)-[:LIVES_IN]-(kutaisi:Location), (maangeli:Person)-[:WORKED_AT]-(maang:Company), path = shortestPath((kutaiseli)-[*]-(maangeli))\nwhere toLower(kutaisi.country) = 'new zealand'\nand maang.name in ['Johnson-Rogers', 'Hooper PLC', 'Patterson, Camacho and White', 'Rogers-Hobbs', 'Ruiz Ltd']\nand kutaiseli <> maangeli\nreturn avg(length(path));",
+    "expected_results": [
+      {
+        "avg(length(path))": 1.7906432748538006
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:28:38",
+    "tags": []
+  },
+  {
+    "id": "38",
+    "category": "aggregation",
+    "difficulty": "hard",
+    "natural_language_query": "Based on country, how many different jobs did a person have on average?",
+    "ground_truth_cypher": "match (p:Person)-[:LIVES_IN]->(loc:Location)\nwhere loc.country is not null\noptional match (p)-[:HAD_POSITION]->(jt:JobTitle)\nwith p, loc.country as countryName, count(distinct jt.title) as numberOfDistinctJobs\nreturn countryName, avg(numberOfDistinctJobs) as averageDistinctJobsPerPersonInCountry\norder by averageDistinctJobsPerPersonInCountry desc;",
+    "expected_results": [
+      {
+        "country": "New Zealand",
+        "avg(size(jobs))": 4.4
+      },
+      {
+        "country": "Kiribati",
+        "avg(size(jobs))": 4
+      },
+      {
+        "country": "Korea",
+        "avg(size(jobs))": 5.142857142857143
+      },
+      {
+        "country": "Seychelles",
+        "avg(size(jobs))": 4.5
+      },
+      {
+        "country": "Kazakhstan",
+        "avg(size(jobs))": 5
+      },
+      {
+        "country": "Grenada",
+        "avg(size(jobs))": 4
+      },
+      {
+        "country": "Burundi",
+        "avg(size(jobs))": 3.666666666666665
+      },
+      {
+        "country": "Cape Verde",
+        "avg(size(jobs))": 4
+      },
+      {
+        "country": "Greenland",
+        "avg(size(jobs))": 3.75
+      },
+      {
+        "country": "Syrian Arab Republic",
+        "avg(size(jobs))": 3.5
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-05-15 15:29:49",
+    "tags": []
+  },
+  {
+    "id": "39",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Find all men who married spouses older than their sisters",
+    "ground_truth_cypher": "match (sister:Person)<-[:IS_SIBLING]-(man:Person)-[:IS_WIFE|IS_HUSBAND]->(spouse:Person)\nwhere toLower(sister.gender) = 'female'\nand toLower(man.gender) = 'male'\nand spouse.birthDate < sister.birthDate\nreturn man.firstName",
+    "expected_results": [
+      {
+        "man.firstName": "Charles"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 17:49:02",
+    "tags": []
+  },
+  {
+    "id": "40",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Find locations such that more men than women live there.",
+    "ground_truth_cypher": "match (p:Person)-[:LIVES_IN]-(l:Location)\nwith l.name as location, sum(case when toLower(p.gender) = 'male' then 1 else 0 end) as males, sum(case when toLower(p.gender) = 'female' then 1 else 0 end) as females\nwhere males>females\nreturn location",
+    "expected_results": [
+      {
+        "location": "Stephaniemouth"
+      },
+      {
+        "location": "Rivasside"
+      },
+      {
+        "location": "Lake Michelle"
+      },
+      {
+        "location": "Simsview"
+      },
+      {
+        "location": "Patricialand"
+      },
+      {
+        "location": "East Patrick"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 18:05:00",
+    "tags": []
+  },
+  {
+    "id": "41",
+    "category": "pattern_matching",
+    "difficulty": "medium",
+    "natural_language_query": "Find locations where more men than women live, and display the population of men and women in such places.",
+    "ground_truth_cypher": "match (p:Person)-[:LIVES_IN]-(l:Location)\nwith l.name as location, sum(case when toLower(p.gender) = 'male' then 1 else 0 end) as males, sum(case when toLower(p.gender) = 'female' then 1 else 0 end) as females\nwhere males>females\nreturn location, males, females;",
+    "expected_results": [
+      {
+        "location": "Stephaniemouth",
+        "males": 3,
+        "females": 2
+      },
+      {
+        "location": "Rivasside",
+        "males": 5,
+        "females": 3
+      },
+      {
+        "location": "Lake Michelle",
+        "males": 5,
+        "females": 2
+      },
+      {
+        "location": "Simsview",
+        "males": 5,
+        "females": 1
+      },
+      {
+        "location": "Patricialand",
+        "males": 2,
+        "females": 1
+      },
+      {
+        "location": "East Patrick",
+        "males": 4,
+        "females": 2
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 18:07:33",
+    "tags": []
+  },
+  {
+    "id": "42",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Return top 3 education institutions with most foreign students.",
+    "ground_truth_cypher": "match (p:Person)-[lived:LIVED_IN]-(l:Location)\norder by p, lived.startYear\nwith p, collect(l.country)[0] as firstCountry\nmatch (p)-[:STUDIED_AT]-(e:EducationalInstitution)\nwhere firstCountry <> e.country\nwith e.name as institution, count(*) as foreignStudents\norder by foreignStudents desc\nlimit 3\nreturn institution, foreignStudents;",
+    "expected_results": [
+      {
+        "institution": "South Jeffrey Institute",
+        "foreignStudents": 6
+      },
+      {
+        "institution": "Priceshire Institute",
+        "foreignStudents": 6
+      },
+      {
+        "institution": "Port Nicoleshire Institute",
+        "foreignStudents": 5
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 18:31:48",
+    "tags": []
+  },
+  {
+    "id": "43",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Return education institutions with most foreign students",
+    "ground_truth_cypher": "match (p:Person)-[lived:LIVED_IN]-(l:Location)\norder by p, lived.startYear\nwith p, collect(l.country)[0] as firstCountry\nmatch (p)-[:STUDIED_AT]-(e:EducationalInstitution)\nwhere firstCountry <> e.country\nwith e.name as institution, count(*) as foreignStudents\norder by foreignStudents desc\nreturn institution;",
+    "expected_results": [
+      {
+        "institution": "South Jeffrey Institute"
+      },
+      {
+        "institution": "Priceshire Institute"
+      },
+      {
+        "institution": "Castanedachester Institute"
+      },
+      {
+        "institution": "Port Nicoleshire Institute"
+      },
+      {
+        "institution": "Smithstad University"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 18:35:08",
+    "tags": []
+  },
+  {
+    "id": "44",
+    "category": "pattern_matching",
+    "difficulty": "easy",
+    "natural_language_query": "Who's older than their husband?",
+    "ground_truth_cypher": "match (husband:Person)-[:IS_HUSBAND]->(spouse:Person)\nwhere husband.birthDate > spouse.birthDate\nreturn spouse.firstName",
+    "expected_results": [
+      {
+        "spouse.firstName": "Charles"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 18:39:09",
+    "tags": []
+  },
+  {
+    "id": "45",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Find the oldest married person in each city.",
+    "ground_truth_cypher": "match (l:Location)\nwhere toLower(l.type) = 'city'\noptional match (l)-[:LIVES_IN]-(p:Person)-[:IS_HUSBAND|IS_WIFE]->(spouse:Person)\nwith l.name as city, p\norder by city, p.birthDate\nwith city, collect(p)[0] as oldestMarriedPerson\nreturn city, oldestMarriedPerson.firstName",
+    "expected_results": [
+      {
+        "city": "East Patrick",
+        "oldestMarriedPerson.firstName": null
+      },
+      {
+        "city": "Karenview",
+        "oldestMarriedPerson.firstName": "Savannah"
+      },
+      {
+        "city": "Lake Justinview",
+        "oldestMarriedPerson.firstName": "Mark"
+      },
+      {
+        "city": "Lake Michelle",
+        "oldestMarriedPerson.firstName": "Kevin"
+      },
+      {
+        "city": "North Robert",
+        "oldestMarriedPerson.firstName": "Juan"
+      },
+      {
+        "city": "Patricialand",
+        "oldestMarriedPerson.firstName": null
+      },
+      {
+        "city": "Perryborough",
+        "oldestMarriedPerson.firstName": "Michael"
+      },
+      {
+        "city": "Rivasside",
+        "oldestMarriedPerson.firstName": null
+      },
+      {
+        "city": "Simsview",
+        "oldestMarriedPerson.firstName": "Charles"
+      },
+      {
+        "city": "Stephaniemouth",
+        "oldestMarriedPerson.firstName": "Johnny"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 18:52:36",
+    "tags": []
+  },
+  {
+    "id": "46",
+    "category": "pattern_matching",
+    "difficulty": "hard",
+    "natural_language_query": "Family trees where everyone works.",
+    "ground_truth_cypher": "match (root)-[:IS_HUSBAND|IS_WIFE|IS_PARENT|IS_CHILD|IS_SIBLING*0..50]-(member:Person)\nwith root, collect(distinct member) as familyMembers\nwhere all(member in familyMembers where exists {\n        (member)-[:WORKED_AT]->(c:Company)\n        })\nand size(familyMembers) > 1\nreturn root.firstName + ' ' + root.lastName as familyRoot,\n       [member in familyMembers | member.firstName + ' ' + member.lastName] as employedFamilyMembers\n       order by size(familyMembers) desc;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-28 20:13:27",
+    "tags": []
+  },
+  {
+    "id": "47",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Find isolated individuals.",
+    "ground_truth_cypher": "match (p:Person)\nwhere not exists { (p)-[:IS_HUSBAND|IS_WIFE|IS_PARENT|IS_CHILD|IS_SIBLING]-(p2:Person) }\nand not exists { (p)-[:IS_FRIEND]-() }\nreturn p.firstName;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-28 20:15:52",
+    "tags": []
+  },
+  {
+    "id": "48",
+    "category": "graph_recursion",
+    "difficulty": "hard",
+    "natural_language_query": "Find second cousins.",
+    "ground_truth_cypher": "match (a:Person)-[:IS_CHILD]->(pa1:Person)-[:IS_CHILD]->(gpa:Person),\n      (b:Person)-[:IS_CHILD]->(pb1:Person)-[:IS_CHILD]->(gpb:Person),\n      (gpa)-[:IS_CHILD]->(ggp:Person)<-[:IS_CHILD]-(gpb)\nwhere a <> b\nand not (a)-[:IS_CHILD]->(:Person)<-[:IS_CHILD]-(b)\nand not (a)-[:IS_CHILD]->(:Person)-[:IS_CHILD]->(:Person)<-[:IS_CHILD]-(:Person)<-[:IS_CHILD]-(b)\nreturn a.firstName + ' ' + a.lastName as person1,\n       b.firstName + ' ' + b.lastName as person2\n       order by person1, person2;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-28 20:31:31",
+    "tags": []
+  },
+  {
+    "id": "49",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Who has more cousins than siblings?",
+    "ground_truth_cypher": "match (p:Person)\noptional match (p)-[:IS_SIBLING]-(sibling:Person)\nwith p, count(distinct sibling) AS siblingCount\noptional match (p)-[:IS_CHILD]->(parent:Person)-[:IS_SIBLING]->(auntOrUncle:Person)<-[:IS_CHILD]-(cousin:Person)\nwith p, siblingCount, count(distinct cousin) as cousinCount\nwhere (cousinCount > siblingCount)\nreturn p.firstName, siblingCount, cousinCount;",
+    "expected_results": [
+      {
+        "p.firstName": "Juan"
+      },
+      {
+        "p.firstName": "Debra"
+      },
+      {
+        "p.firstName": "Joseph"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 20:43:25",
+    "tags": []
+  },
+  {
+    "id": "50",
+    "category": "paradox",
+    "difficulty": "hard",
+    "natural_language_query": "Which siblings studied before being born?",
+    "ground_truth_cypher": "match (n)\nwhere 1=2\nreturn n;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-28 20:45:51",
+    "tags": []
+  },
+  {
+    "id": "51",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Who's the oldest person without their family?",
+    "ground_truth_cypher": "match (p:Person)\nwhere not (p)-[:IS_HUSBAND|IS_WIFE|IS_PARENT|IS_CHILD|IS_SIBLING]-(:Person)\nreturn p.firstName\norder by p.birthDate\nlimit 1;",
+    "expected_results": [
+      {
+        "p.firstName": "Andrew"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 20:48:41",
+    "tags": []
+  },
+  {
+    "id": "52",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Who's the youngest person with kids?",
+    "ground_truth_cypher": "match (p:Person)-[:IS_PARENT]->(c:Person)\nreturn p.firstName\norder by p.birthDate desc\nlimit 1;",
+    "expected_results": [
+      {
+        "p.firstName": "Michael"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 20:52:54",
+    "tags": []
+  },
+  {
+    "id": "53",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Who is the most well traveled person?",
+    "ground_truth_cypher": "match (p:Person)-[:LIVED_IN|LIVES_IN]->(loc:Location)\nwith p, count(distinct loc) as locationCount\norder by locationCount desc\nlimit 1\nreturn p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Johnny"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 20:56:06",
+    "tags": []
+  },
+  {
+    "id": "54",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Who is the most popular person with their friends?",
+    "ground_truth_cypher": "match (p:Person)-[:IS_FRIEND]-(:Person)\nwith p, count(*) as friendCount\norder by friendCount desc\nlimit 1\nreturn p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Eric"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 20:58:37",
+    "tags": []
+  },
+  {
+    "id": "55",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Find people who have changed location 3 times.",
+    "ground_truth_cypher": "match (p:Person)-[:LIVES_IN|LIVED_IN]-(l:Location)\nwith p, count(l) as locations\nwhere locations > 3\nreturn p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Johnny"
+      },
+      {
+        "p.firstName": "Stephanie"
+      },
+      {
+        "p.firstName": "Thomas"
+      },
+      {
+        "p.firstName": "Eric"
+      },
+      {
+        "p.firstName": "Dana"
+      },
+      {
+        "p.firstName": "Vanessa"
+      },
+      {
+        "p.firstName": "Eugene"
+      },
+      {
+        "p.firstName": "Steve"
+      },
+      {
+        "p.firstName": "Tammy"
+      },
+      {
+        "p.firstName": "Charles"
+      },
+      {
+        "p.firstName": "Connie"
+      },
+      {
+        "p.firstName": "Crystal"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-28 21:14:22",
+    "tags": []
+  },
+  {
+    "id": "56",
+    "category": "Inconclusive",
+    "difficulty": "medium",
+    "natural_language_query": "Show people who are friends on Facebook.",
+    "ground_truth_cypher": "match (n)\n where 1=2\nreturn n;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-29 18:35:16",
+    "tags": []
+  },
+  {
+    "id": "57",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "List people whose jobs rhyme with the word preacher.",
+    "ground_truth_cypher": "match (p:Person)-[:HAD_POSITION]->(jt:JobTitle)\nwhere toLower(jt.title) ends with 'eacher'\nreturn distinct p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Juan"
+      },
+      {
+        "p.firstName": "Savannah"
+      },
+      {
+        "p.firstName": "Mia"
+      },
+      {
+        "p.firstName": "Johnny"
+      },
+      {
+        "p.firstName": "Joseph"
+      },
+      {
+        "p.firstName": "Jessica"
+      },
+      {
+        "p.firstName": "Jordan"
+      },
+      {
+        "p.firstName": "Tracey"
+      },
+      {
+        "p.firstName": "Crystal"
+      },
+      {
+        "p.firstName": "Nathaniel"
+      },
+      {
+        "p.firstName": "David"
+      },
+      {
+        "p.firstName": "Samuel"
+      },
+      {
+        "p.firstName": "Theresa"
+      },
+      {
+        "p.firstName": "William"
+      },
+      {
+        "p.firstName": "Todd"
+      },
+      {
+        "p.firstName": "Tammy"
+      },
+      {
+        "p.firstName": "Michael"
+      },
+      {
+        "p.firstName": "Angel"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 18:40:43",
+    "tags": []
+  },
+  {
+    "id": "58",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Find people currently living in a city they were born in.",
+    "ground_truth_cypher": "match (p:Person)-[:LIVES_IN]->(loc:Location)\nwhere p.birthPlace = loc.name\nreturn p.firstName;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-29 19:17:39",
+    "tags": []
+  },
+  {
+    "id": "59",
+    "category": "graph_recursion",
+    "difficulty": "hard",
+    "natural_language_query": "Can you find the longest friendship chain?",
+    "ground_truth_cypher": "match path = (p:Person)-[:IS_FRIEND*1..100]-(q:Person)\nwhere p.id < q.id\nwith p, q, length(path) as l\norder by l desc\nlimit 1\nreturn p.firstName + ' ' + p.lastName as PersonA,\n       q.firstName + ' ' + q.lastName as PersonB,\n       l as FriendshipChainLength;",
+    "expected_results": [
+      {
+        "result": "all 50 nodes should be connected and returned, my slow laptop can't process the query though"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 19:38:02",
+    "tags": []
+  },
+  {
+    "id": "60",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Find siblings who studied the same things.",
+    "ground_truth_cypher": "match (a:Person)-[:IS_SIBLING]->(b:Person),\n(a)-[:STUDIED]->(fieldA:FieldOfStudy),\n(b)-[:STUDIED]->(fieldB:FieldOfStudy)\nwhere fieldA.name = fieldB.name\nreturn distinct a.firstName, b.firstName;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-29 19:41:25",
+    "tags": []
+  },
+  {
+    "id": "61",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Find palindromic first names in the database.",
+    "ground_truth_cypher": "match (p:Person)\nwhere toLower(p.firstName) = reverse(toLower(p.firstName))\nreturn p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Anna"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 19:43:20",
+    "tags": []
+  },
+  {
+    "id": "62",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Find all the people who are both a child and a parent.",
+    "ground_truth_cypher": "match (child:Person)-[:IS_CHILD]->(p:Person)-[:IS_CHILD]->(parent:Person)\nreturn distinct p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Connie"
+      },
+      {
+        "p.firstName": "Mia"
+      },
+      {
+        "p.firstName": "Charles"
+      },
+      {
+        "p.firstName": "Joseph"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 19:46:19",
+    "tags": []
+  },
+  {
+    "id": "63",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "List people who have both a parent and a child in the graph.",
+    "ground_truth_cypher": "match (child:Person)-[:IS_CHILD]->(p:Person)-[:IS_CHILD]->(parent:Person)\nreturn distinct p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Connie"
+      },
+      {
+        "p.firstName": "Mia"
+      },
+      {
+        "p.firstName": "Charles"
+      },
+      {
+        "p.firstName": "Joseph"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 19:47:02",
+    "tags": []
+  },
+  {
+    "id": "64",
+    "category": "pattern_matching",
+    "difficulty": "medium",
+    "natural_language_query": "Find married couples that live in different cities.",
+    "ground_truth_cypher": "match (p1:Person)-[:IS_HUSBAND|IS_WIFE]->(p2:Person),\n(p1)-[:LIVES_IN]->(loc1:Location),\n(p2)-[:LIVES_IN]->(loc2:Location)\nwhere loc1.name <> loc2.name\nand p1.id < p2.id\nreturn p1.firstName, p2.firstName;",
+    "expected_results": [
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Kevin"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Mia",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Juan",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Johnny"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Jessica"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 20:02:41",
+    "tags": []
+  },
+  {
+    "id": "65",
+    "category": "graph_recursion",
+    "difficulty": "hard",
+    "natural_language_query": "Find all friend groups of 3.",
+    "ground_truth_cypher": "match (p1:Person)-[:IS_FRIEND]->(p2:Person)-[:IS_FRIEND]->(p3:Person),\n      (p3)-[:IS_FRIEND]->(p1)\nwhere p1.id < p2.id\nand p2.id < p3.id\nreturn p1.firstName, p2.firstName, p3.firstName;",
+    "expected_results": [
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Vanessa",
+        "p3.firstName": "Connie"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Cheryl",
+        "p3.firstName": "Connie"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Jared",
+        "p3.firstName": "Connie"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Thomas",
+        "p3.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Eugene",
+        "p3.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Brandi",
+        "p3.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Joseph",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Jessica",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Jordan",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Cheryl",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Cheryl",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Cheryl",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Andrew",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Andrew",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Christopher",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Christopher",
+        "p3.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Michael",
+        "p3.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Christopher",
+        "p3.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Christopher",
+        "p3.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Anna",
+        "p3.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Scott",
+        "p3.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Joseph",
+        "p3.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Timothy",
+        "p3.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Todd",
+        "p2.firstName": "Rachel",
+        "p3.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Michael",
+        "p3.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Eric",
+        "p2.firstName": "Michael",
+        "p3.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Rachel",
+        "p2.firstName": "Angel",
+        "p3.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Joseph",
+        "p3.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "Annette",
+        "p3.firstName": "Jared"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Thomas",
+        "p3.firstName": "Brandi"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "Cheryl",
+        "p3.firstName": "Steve"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "David",
+        "p3.firstName": "April"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Timothy",
+        "p3.firstName": "April"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Johnny",
+        "p3.firstName": "William"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Joseph",
+        "p3.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Cheryl",
+        "p3.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Brandi",
+        "p3.firstName": "Scott"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "William",
+        "p3.firstName": "Rachel"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Todd",
+        "p3.firstName": "Rachel"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Scott",
+        "p3.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "April",
+        "p3.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "April",
+        "p3.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "April",
+        "p3.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "April",
+        "p3.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Andrew",
+        "p3.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Andrew",
+        "p3.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Scott",
+        "p3.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Donald",
+        "p3.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Connie",
+        "p3.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Jessica",
+        "p3.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "David",
+        "p3.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Eric",
+        "p3.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Annette",
+        "p3.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Thomas",
+        "p3.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Brandi",
+        "p3.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Tammy",
+        "p3.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Tammy",
+        "p3.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Jared",
+        "p3.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Rachel",
+        "p3.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Rachel",
+        "p3.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Tammy",
+        "p3.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Tammy",
+        "p3.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Scott",
+        "p3.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Scott",
+        "p3.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Scott",
+        "p3.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Joseph",
+        "p3.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Vanessa",
+        "p3.firstName": "Joseph"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 20:08:52",
+    "tags": []
+  },
+  {
+    "id": "66",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Look for all degrees held by people and count them per degree type.",
+    "ground_truth_cypher": "match (p:Person)-[r:STUDIED]->(f:FieldOfStudy)\nreturn r.degree, count(*);",
+    "expected_results": [
+      {
+        "r.degree": "Bachelor",
+        "count(*)": 32
+      },
+      {
+        "r.degree": "PhD",
+        "count(*)": 3
+      },
+      {
+        "r.degree": "Master",
+        "count(*)": 1
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 20:12:51",
+    "tags": []
+  },
+  {
+    "id": "67",
+    "category": "pattern_matching",
+    "difficulty": "hard",
+    "natural_language_query": "Find people with double letter initials, like N.N.",
+    "ground_truth_cypher": "match (p:Person)\nwhere left(p.firstName, 1) = left(p.lastName, 1)\nreturn p.firstName, p.lastName;",
+    "expected_results": [
+      {
+        "p.firstName": "Brandi",
+        "p.lastName": "Bailey"
+      },
+      {
+        "p.firstName": "Matthew",
+        "p.lastName": "Marshall"
+      },
+      {
+        "p.firstName": "Dana",
+        "p.lastName": "Douglas"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 20:15:20",
+    "tags": []
+  },
+  {
+    "id": "68",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Find names that are both first names and last names in the database.",
+    "ground_truth_cypher": "match (p1:Person), (p2:Person)\nwhere p1.firstName = p2.lastName\nreturn distinct p1.firstName;",
+    "expected_results": [
+      {
+        "p1.firstName": "David"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 20:17:51",
+    "tags": []
+  },
+  {
+    "id": "69",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Find people who are missing birthdates.",
+    "ground_truth_cypher": "match (p:Person)\nwhere p.birthDate is null\nreturn p.firstName;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-29 20:19:01",
+    "tags": []
+  },
+  {
+    "id": "70",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Which companies were founded in the same year?",
+    "ground_truth_cypher": "match (c1:Company), (c2:Company)\nwhere c1.foundedYear = c2.foundedYear\nand c1.id < c2.id\nreturn c1.name, c2.name;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-29 20:32:01",
+    "tags": []
+  },
+  {
+    "id": "71",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Show me all universities founded before 1800.",
+    "ground_truth_cypher": "match (e:EducationalInstitution)\nwhere e.foundedYear < 1800\nreturn e.name;",
+    "expected_results": [
+      {
+        "e.name": "Priceshire Institute"
+      },
+      {
+        "e.name": "Port Nicoleshire Institute"
+      },
+      {
+        "e.name": "Smithstad University"
+      },
+      {
+        "e.name": "Castanedachester Institute"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 20:42:57",
+    "tags": []
+  },
+  {
+    "id": "72",
+    "category": "pattern_matching",
+    "difficulty": "easy",
+    "natural_language_query": "Find people who share the same birthday.",
+    "ground_truth_cypher": "match (p1:Person), (p2:Person)\nwhere date(p1.birthDate).month = date(p2.birthDate).month\nand date(p1.birthDate).day = date(p2.birthDate).day\nand p1.id < p2.id\nreturn p1.firstName, p2.firstName;",
+    "expected_results": [
+      {
+        "p1.firstName": "Timothy",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Joseph"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 20:46:41",
+    "tags": []
+  },
+  {
+    "id": "73",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "List all job titles in the management category.",
+    "ground_truth_cypher": "match (j:JobTitle)\nwhere toLower(j.category) = 'management'\nreturn j.title;",
+    "expected_results": [
+      {
+        "j.title": "CTO"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 20:49:42",
+    "tags": []
+  },
+  {
+    "id": "74",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "What fields of study belong to the humanities category?",
+    "ground_truth_cypher": "match (f:FieldOfStudy)\nwhere toLower(f.category) = 'humanities'\nreturn f.name;",
+    "expected_results": [
+      {
+        "f.name": "Medicine"
+      },
+      {
+        "f.name": "Law"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 20:51:51",
+    "tags": []
+  },
+  {
+    "id": "75",
+    "category": "pattern_matching",
+    "difficulty": "easy",
+    "natural_language_query": "Find people whose email domain matches their company name.",
+    "ground_truth_cypher": "match (p:Person)-[:WORKED_AT]-(c:Company)\nwhere toLower(p.email) contains c.name\nreturn p.firstName;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-29 21:30:18",
+    "tags": []
+  },
+  {
+    "id": "76",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Show me all cities with population over 1 million.",
+    "ground_truth_cypher": "match (l:Location)\nwhere toLower(l.type) = 'city'\nand l.population > 1000000\nreturn l.name;",
+    "expected_results": [
+      {
+        "l.name": "Stephaniemouth"
+      },
+      {
+        "l.name": "Rivasside"
+      },
+      {
+        "l.name": "Lake Michelle"
+      },
+      {
+        "l.name": "Karenview"
+      },
+      {
+        "l.name": "Simsview"
+      },
+      {
+        "l.name": "Lake Justinview"
+      },
+      {
+        "l.name": "Patricialand"
+      },
+      {
+        "l.name": "East Patrick"
+      },
+      {
+        "l.name": "Perryborough"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 21:33:30",
+    "tags": []
+  },
+  {
+    "id": "77",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Who graduated from university in 2016?",
+    "ground_truth_cypher": "match (p:Person)-[s:STUDIED_AT]-(e:EducationalInstitution)\nwhere s.endYear = 2016\nreturn p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Samuel"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 22:07:19",
+    "tags": []
+  },
+  {
+    "id": "78",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Which married couples have the biggest age gap?",
+    "ground_truth_cypher": "match (p1:Person)-[:IS_HUSBAND|IS_WIFE]-(p2:Person)\nwith p1, p2, duration.between(date(p2.birthDate), date(p1.birthDate)) as ageGap\nreturn p1.firstName, p2.firstName\norder by ageGap desc\nlimit 1;",
+    "expected_results": [
+      {
+        "p1.firstName": "Michael",
+        "p2.firstName": "Mia"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 22:11:53",
+    "tags": []
+  },
+  {
+    "id": "79",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Show me people who studied longer than 4 years at university.",
+    "ground_truth_cypher": "match (p:Person)-[s:STUDIED_AT]-(e:EducationalInstitution)\nwhere s.endYear - s.startYear > 4\nreturn p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Scott"
+      },
+      {
+        "p.firstName": "Dana"
+      },
+      {
+        "p.firstName": "Cheryl"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 22:15:07",
+    "tags": []
+  },
+  {
+    "id": "80",
+    "category": "pattern_matching",
+    "difficulty": "medium",
+    "natural_language_query": "Find friends who work in competing companies in the same industry.",
+    "ground_truth_cypher": "match (p1:Person)-[w1:WORKED_AT]-(c1:Company),\n      (p2:Person)-[w2:WORKED_AT]-(c2:Company)\nwhere p1.id < p2.id\nand c1.id <> c2.id\nand c1.industry = c2.industry\nand w1.endYear is null\nand w2.endYear is null\nreturn p1.firstName, p2.firstName;",
+    "expected_results": [
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Steve",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Todd",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Michael",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Vanessa"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Vanessa"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Annette"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Annette"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Annette"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Samuel"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Samuel"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Samuel"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Samuel"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Samuel"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Samuel"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Samuel"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Donald",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Donald",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Christopher",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Tanya"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Tracey"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Cheryl"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Cheryl"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Timothy",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Connie"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Connie"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Connie"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Andrew",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Matthew",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Christopher",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Angel",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Juan",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Stephanie"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Stephanie"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Logan"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Logan"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Logan"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Andrew",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Andrew",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Matthew",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Christopher",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Angel",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Juan",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Nathaniel"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Jeffrey"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Steve"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Scott"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Todd"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Tanya",
+        "p2.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Cheryl",
+        "p2.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Eric",
+        "p2.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Tanya",
+        "p2.firstName": "David"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "David"
+      },
+      {
+        "p1.firstName": "Tanya",
+        "p2.firstName": "Timothy"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "Timothy"
+      },
+      {
+        "p1.firstName": "Cheryl",
+        "p2.firstName": "Timothy"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Andrew",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Donald",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Matthew",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Angel",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "David"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "David"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Eugene"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Eugene"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Eugene"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Eugene"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Theresa"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Theresa"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Theresa"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Theresa"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Theresa"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Theresa"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Theresa"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Andrew",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Andrew",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Andrew",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Donald",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Matthew",
+        "p2.firstName": "Christopher"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 22:38:39",
+    "tags": []
+  },
+  {
+    "id": "81",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Find people who started working before finishing their studies.",
+    "ground_truth_cypher": "match (e:EducationalInstitution)-[s:STUDIED_AT]-(p:Person)-[w:WORKED_AT]-(c:Company)\nwhere w.startYear < s.endYear\nreturn p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Charles"
+      },
+      {
+        "p.firstName": "Annette"
+      },
+      {
+        "p.firstName": "Samuel"
+      },
+      {
+        "p.firstName": "William"
+      },
+      {
+        "p.firstName": "Scott"
+      },
+      {
+        "p.firstName": "Tammy"
+      },
+      {
+        "p.firstName": "Dana"
+      },
+      {
+        "p.firstName": "Dana"
+      },
+      {
+        "p.firstName": "Debra"
+      },
+      {
+        "p.firstName": "Johnny"
+      },
+      {
+        "p.firstName": "Johnny"
+      },
+      {
+        "p.firstName": "Dana"
+      },
+      {
+        "p.firstName": "Dana"
+      },
+      {
+        "p.firstName": "Tracey"
+      },
+      {
+        "p.firstName": "Cheryl"
+      },
+      {
+        "p.firstName": "Cheryl"
+      },
+      {
+        "p.firstName": "Cheryl"
+      },
+      {
+        "p.firstName": "Timothy"
+      },
+      {
+        "p.firstName": "Donald"
+      },
+      {
+        "p.firstName": "Donald"
+      },
+      {
+        "p.firstName": "Eric"
+      },
+      {
+        "p.firstName": "Connie"
+      },
+      {
+        "p.firstName": "David"
+      },
+      {
+        "p.firstName": "Christopher"
+      },
+      {
+        "p.firstName": "Dana"
+      },
+      {
+        "p.firstName": "Mia"
+      },
+      {
+        "p.firstName": "Thomas"
+      },
+      {
+        "p.firstName": "Theresa"
+      },
+      {
+        "p.firstName": "Tammy"
+      },
+      {
+        "p.firstName": "Todd"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 22:42:05",
+    "tags": []
+  },
+  {
+    "id": "82",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Which field of study has the shortest average study duration?",
+    "ground_truth_cypher": "match (p:Person)-[s:STUDIED]-(f:FieldOfStudy)\nwhere s.endYear is not null\nwith f, avg(s.endYear - s.startYear) as studyDuration\nreturn f.name\norder by studyDuration\nlimit 1;",
+    "expected_results": [
+      {
+        "f.name": "Law"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 22:47:51",
+    "tags": []
+  },
+  {
+    "id": "83",
+    "category": "pattern_matching",
+    "difficulty": "medium",
+    "natural_language_query": "Show me parent-child pairs who work in the same company.",
+    "ground_truth_cypher": "match (c:Company)-[w1:WORKED_AT]-(child:Person)-[:IS_CHILD]->(parent:Person)-[w2:WORKED_AT]-(c)\nwhere w1.endYear is null\nand w2.endYear is null\nreturn child.firstName, parent.firstName;",
+    "expected_results": [
+      {
+        "child.firstName": "Connie",
+        "parent.firstName": "Kevin"
+      },
+      {
+        "child.firstName": "Charles",
+        "parent.firstName": "Mark"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 22:50:47",
+    "tags": []
+  },
+  {
+    "id": "84",
+    "category": "graph_recursion",
+    "difficulty": "hard",
+    "natural_language_query": "Find family dynasties where multiple generations attended the same university.",
+    "ground_truth_cypher": "match path = (p1:Person)-[:IS_CHILD*1..5]->(p2:Person),\n      (p1)-[:STUDIED_AT]->(u:EducationalInstitution),\n      (p2)-[:STUDIED_AT]->(u)\nwith collect(distinct p1) + collect(distinct p2) as family\nreturn [p in family | p.firstName];",
+    "expected_results": [
+      {
+        "[p in family | p.firstName]": ["Mia", "Kevin"]
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 22:59:11",
+    "tags": []
+  },
+  {
+    "id": "85",
+    "category": "pattern_matching",
+    "difficulty": "hard",
+    "natural_language_query": "Detect circular migration patterns where people return to their birth country after living abroad.",
+    "ground_truth_cypher": "match (p:Person)-[l1:LIVED_IN]->(loc1:Location)\nwith p, loc1\norder by p, l1.startYear\nwith p, collect(loc1)[0] as origin\nmatch (p)-[l2:LIVED_IN]->(loc2:Location)\nwhere loc2.country <> origin.country\nwith p, origin, max(l2.startYear) as abroadYear\nmatch (p)-[l3:LIVES_IN]->(loc3:Location)\nwhere l3.startYear > abroadYear and loc3.country = origin.country\nreturn distinct p.firstName;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-29 23:15:41",
+    "tags": []
+  },
+  {
+    "id": "86",
+    "category": "pattern_matching",
+    "difficulty": "hard",
+    "natural_language_query": "Find anomalies in educational timelines where people studied multiple degrees simultaneously.",
+    "ground_truth_cypher": "match (f1:FieldOfStudy)-[s1:STUDIED]-(p:Person)-[s2:STUDIED]-(f2:FieldOfStudy)\nwhere s1.startYear > s2.startYear\nand s1.startYear < s2.endYear\nreturn p.firstName, s1.degree, s2.degree;",
+    "expected_results": [
+      {
+        "p.firstName": "Mia",
+        "s1.degree": "Bachelor",
+        "s2.degree": "Bachelor"
+      },
+      {
+        "p.firstName": "Cheryl",
+        "s1.degree": "PhD",
+        "s2.degree": "Bachelor"
+      },
+      {
+        "p.firstName": "Dana",
+        "s1.degree": "PhD",
+        "s2.degree": "Bachelor"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 23:21:58",
+    "tags": []
+  },
+  {
+    "id": "87",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Find people who never changed their location.",
+    "ground_truth_cypher": "match (p:Person)\nwhere not exists {(p)-[:LIVED_IN]-(l:Location)}\nreturn p.firstName;",
+    "expected_results": [
+      {
+        "p.firstName": "Anna"
+      },
+      {
+        "p.firstName": "Mia"
+      },
+      {
+        "p.firstName": "Michael"
+      },
+      {
+        "p.firstName": "Jessica"
+      },
+      {
+        "p.firstName": "Jordan"
+      },
+      {
+        "p.firstName": "David"
+      },
+      {
+        "p.firstName": "Nathaniel"
+      },
+      {
+        "p.firstName": "Jeffrey"
+      },
+      {
+        "p.firstName": "Cheryl"
+      },
+      {
+        "p.firstName": "Jared"
+      },
+      {
+        "p.firstName": "Timothy"
+      },
+      {
+        "p.firstName": "Brandi"
+      },
+      {
+        "p.firstName": "Logan"
+      },
+      {
+        "p.firstName": "William"
+      },
+      {
+        "p.firstName": "Donald"
+      },
+      {
+        "p.firstName": "Rachel"
+      },
+      {
+        "p.firstName": "Matthew"
+      },
+      {
+        "p.firstName": "Angel"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 23:28:25",
+    "tags": []
+  },
+  {
+    "id": "88",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Which company has the smallest number of employees?",
+    "ground_truth_cypher": "match (p:Person)-[w:WORKED_AT]-(c:Company)\nwhere w.endYear is null\nwith c, count(distinct p) as workers\norder by workers\nreturn c.name\nlimit 1;",
+    "expected_results": [
+      {
+        "c.name": "Hooper PLC"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 23:32:11",
+    "tags": []
+  },
+  {
+    "id": "89",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Show me all people with Gmail email addresses.",
+    "ground_truth_cypher": "match (p:Person)\nwhere toLower(p.email) contains 'gmail'\nreturn p.firstName, p.email;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-29 23:34:10",
+    "tags": []
+  },
+  {
+    "id": "90",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Find all educational institutions of type 'College'.",
+    "ground_truth_cypher": "match (e:EducationalInstitution)\nwhere toLower(e.type) = 'college'\nreturn e.name;",
+    "expected_results": [
+      {
+        "e.name": "Port Nicoleshire Institute"
+      },
+      {
+        "e.name": "Smithstad University"
+      },
+      {
+        "e.name": "Castanedachester Institute"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 23:36:15",
+    "tags": []
+  },
+  {
+    "id": "91",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "List people who are currently unemployed.",
+    "ground_truth_cypher": "match (p:Person)\nwhere not exists {(p)-[w:WORKED_AT]-(c:Company)\n                   where w.endYear is null}\nreturn p.firstName, p.lastName;",
+    "expected_results": [
+      {
+        "p.firstName": "Michael",
+        "p.lastName": "Robinson"
+      },
+      {
+        "p.firstName": "Jared",
+        "p.lastName": "David"
+      },
+      {
+        "p.firstName": "Brandi",
+        "p.lastName": "Bailey"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 23:52:56",
+    "tags": []
+  },
+  {
+    "id": "92",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Which field of study has the most students enrolled?",
+    "ground_truth_cypher": "match (p:Person)-[s:STUDIED]-(f:FieldOfStudy)\nwhere s.endYear is null\nwith f, count(p) as enrolled\norder by enrolled desc\nreturn f.name\nlimit 1;",
+    "expected_results": [
+      {
+        "f.name": "Business Administration"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-29 23:57:33",
+    "tags": []
+  },
+  {
+    "id": "93",
+    "category": "pattern_matching",
+    "difficulty": "medium",
+    "natural_language_query": "Find people born in the same decade.",
+    "ground_truth_cypher": "match (p1:Person), (p2:Person)\nwhere p1.id < p2.id\nand toInteger(date(p1.birthDate).year / 10) = toInteger(date(p2.birthDate).year / 10)\nreturn p1.firstName, p2.firstName, p1.birthDate, p2.birthDate;",
+    "expected_results": [
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Kevin",
+        "p1.birthDate": "1928-06-16",
+        "p2.birthDate": "1929-11-07"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Kevin",
+        "p1.birthDate": "1927-12-04",
+        "p2.birthDate": "1929-11-07"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Kevin",
+        "p1.birthDate": "1927-11-20",
+        "p2.birthDate": "1929-11-07"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Connie",
+        "p1.birthDate": "1928-06-16",
+        "p2.birthDate": "1929-01-23"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Connie",
+        "p1.birthDate": "1927-12-04",
+        "p2.birthDate": "1929-01-23"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Connie",
+        "p1.birthDate": "1927-11-20",
+        "p2.birthDate": "1929-01-23"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Connie",
+        "p1.birthDate": "1929-11-07",
+        "p2.birthDate": "1929-01-23"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Connie",
+        "p1.birthDate": "1926-04-29",
+        "p2.birthDate": "1929-01-23"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Anna",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1931-09-23"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Anna",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1931-09-23"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Anna",
+        "p1.birthDate": "1934-09-13",
+        "p2.birthDate": "1931-09-23"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Anna",
+        "p1.birthDate": "1933-03-03",
+        "p2.birthDate": "1931-09-23"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Anna",
+        "p1.birthDate": "1933-08-17",
+        "p2.birthDate": "1931-09-23"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Anna",
+        "p1.birthDate": "1937-05-09",
+        "p2.birthDate": "1931-09-23"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Juan",
+        "p1.birthDate": "1943-03-10",
+        "p2.birthDate": "1948-05-13"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Juan",
+        "p1.birthDate": "1949-04-30",
+        "p2.birthDate": "1948-05-13"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Juan",
+        "p1.birthDate": "1945-06-15",
+        "p2.birthDate": "1948-05-13"
+      },
+      {
+        "p1.firstName": "Matthew",
+        "p2.firstName": "Juan",
+        "p1.birthDate": "1945-06-20",
+        "p2.birthDate": "1948-05-13"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1934-09-13",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1933-03-03",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1933-08-17",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1937-05-09",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1931-09-23",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Rachel",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1932-12-20",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Michael",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1930-11-03",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Christopher",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1930-12-01",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Angel",
+        "p2.firstName": "Savannah",
+        "p1.birthDate": "1932-02-17",
+        "p2.birthDate": "1935-02-12"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Mia",
+        "p1.birthDate": "1976-07-18",
+        "p2.birthDate": "1972-02-14"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Mia",
+        "p1.birthDate": "1979-06-01",
+        "p2.birthDate": "1972-02-14"
+      },
+      {
+        "p1.firstName": "Jared",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "2005-07-04",
+        "p2.birthDate": "2000-03-19"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "2001-12-06",
+        "p2.birthDate": "2000-03-19"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "2000-07-21",
+        "p2.birthDate": "2000-03-19"
+      },
+      {
+        "p1.firstName": "Todd",
+        "p2.firstName": "Debra",
+        "p1.birthDate": "1987-01-29",
+        "p2.birthDate": "1982-07-31"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Jordan",
+        "p1.birthDate": "1928-06-16",
+        "p2.birthDate": "1927-12-04"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Vanessa",
+        "p1.birthDate": "1964-04-28",
+        "p2.birthDate": "1969-12-03"
+      },
+      {
+        "p1.firstName": "Tanya",
+        "p2.firstName": "Tracey",
+        "p1.birthDate": "1992-10-03",
+        "p2.birthDate": "1991-06-25"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "David",
+        "p1.birthDate": "1951-11-13",
+        "p2.birthDate": "1957-03-25"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Crystal",
+        "p1.birthDate": "1928-06-16",
+        "p2.birthDate": "1927-11-20"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Crystal",
+        "p1.birthDate": "1927-12-04",
+        "p2.birthDate": "1927-11-20"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Nathaniel",
+        "p1.birthDate": "1964-04-28",
+        "p2.birthDate": "1967-04-08"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Nathaniel",
+        "p1.birthDate": "1969-12-03",
+        "p2.birthDate": "1967-04-08"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Jeffrey",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1935-09-02"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "David",
+        "p1.birthDate": "1943-03-10",
+        "p2.birthDate": "1949-04-30"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Stephanie",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1934-09-13"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Stephanie",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1934-09-13"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Cheryl",
+        "p1.birthDate": "1951-11-13",
+        "p2.birthDate": "1951-09-03"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Cheryl",
+        "p1.birthDate": "1957-03-25",
+        "p2.birthDate": "1951-09-03"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Thomas",
+        "p1.birthDate": "1928-06-16",
+        "p2.birthDate": "1926-04-29"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Thomas",
+        "p1.birthDate": "1927-12-04",
+        "p2.birthDate": "1926-04-29"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Thomas",
+        "p1.birthDate": "1927-11-20",
+        "p2.birthDate": "1926-04-29"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Thomas",
+        "p1.birthDate": "1929-11-07",
+        "p2.birthDate": "1926-04-29"
+      },
+      {
+        "p1.firstName": "Jared",
+        "p2.firstName": "Eugene",
+        "p1.birthDate": "2005-07-04",
+        "p2.birthDate": "2001-12-06"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Timothy",
+        "p1.birthDate": "1964-04-28",
+        "p2.birthDate": "1961-10-25"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Timothy",
+        "p1.birthDate": "1969-12-03",
+        "p2.birthDate": "1961-10-25"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "Timothy",
+        "p1.birthDate": "1967-04-08",
+        "p2.birthDate": "1961-10-25"
+      },
+      {
+        "p1.firstName": "Jared",
+        "p2.firstName": "Brandi",
+        "p1.birthDate": "2005-07-04",
+        "p2.birthDate": "2000-07-21"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Brandi",
+        "p1.birthDate": "2001-12-06",
+        "p2.birthDate": "2000-07-21"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Logan",
+        "p1.birthDate": "1943-03-10",
+        "p2.birthDate": "1945-06-15"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Logan",
+        "p1.birthDate": "1949-04-30",
+        "p2.birthDate": "1945-06-15"
+      },
+      {
+        "p1.firstName": "Tanya",
+        "p2.firstName": "Steve",
+        "p1.birthDate": "1992-10-03",
+        "p2.birthDate": "1999-02-19"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "Steve",
+        "p1.birthDate": "1991-06-25",
+        "p2.birthDate": "1999-02-19"
+      },
+      {
+        "p1.firstName": "Tanya",
+        "p2.firstName": "Samuel",
+        "p1.birthDate": "1992-10-03",
+        "p2.birthDate": "1994-01-03"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "Samuel",
+        "p1.birthDate": "1991-06-25",
+        "p2.birthDate": "1994-01-03"
+      },
+      {
+        "p1.firstName": "Steve",
+        "p2.firstName": "Samuel",
+        "p1.birthDate": "1999-02-19",
+        "p2.birthDate": "1994-01-03"
+      },
+      {
+        "p1.firstName": "Tanya",
+        "p2.firstName": "April",
+        "p1.birthDate": "1992-10-03",
+        "p2.birthDate": "1995-10-25"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "April",
+        "p1.birthDate": "1991-06-25",
+        "p2.birthDate": "1995-10-25"
+      },
+      {
+        "p1.firstName": "Steve",
+        "p2.firstName": "April",
+        "p1.birthDate": "1999-02-19",
+        "p2.birthDate": "1995-10-25"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "April",
+        "p1.birthDate": "1994-01-03",
+        "p2.birthDate": "1995-10-25"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Theresa",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1933-03-03"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Theresa",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1933-03-03"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Theresa",
+        "p1.birthDate": "1934-09-13",
+        "p2.birthDate": "1933-03-03"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Andrew",
+        "p1.birthDate": "1928-06-16",
+        "p2.birthDate": "1926-01-22"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Andrew",
+        "p1.birthDate": "1927-12-04",
+        "p2.birthDate": "1926-01-22"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Andrew",
+        "p1.birthDate": "1927-11-20",
+        "p2.birthDate": "1926-01-22"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Andrew",
+        "p1.birthDate": "1929-11-07",
+        "p2.birthDate": "1926-01-22"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Andrew",
+        "p1.birthDate": "1926-04-29",
+        "p2.birthDate": "1926-01-22"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Andrew",
+        "p1.birthDate": "1929-01-23",
+        "p2.birthDate": "1926-01-22"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "William",
+        "p1.birthDate": "1964-04-28",
+        "p2.birthDate": "1961-11-17"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "William",
+        "p1.birthDate": "1969-12-03",
+        "p2.birthDate": "1961-11-17"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "William",
+        "p1.birthDate": "1967-04-08",
+        "p2.birthDate": "1961-11-17"
+      },
+      {
+        "p1.firstName": "Timothy",
+        "p2.firstName": "William",
+        "p1.birthDate": "1961-10-25",
+        "p2.birthDate": "1961-11-17"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Tammy",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1933-08-17"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Tammy",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1933-08-17"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Tammy",
+        "p1.birthDate": "1934-09-13",
+        "p2.birthDate": "1933-08-17"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Tammy",
+        "p1.birthDate": "1933-03-03",
+        "p2.birthDate": "1933-08-17"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Scott",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1937-05-09"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Scott",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1937-05-09"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Scott",
+        "p1.birthDate": "1934-09-13",
+        "p2.birthDate": "1937-05-09"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Scott",
+        "p1.birthDate": "1933-03-03",
+        "p2.birthDate": "1937-05-09"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Scott",
+        "p1.birthDate": "1933-08-17",
+        "p2.birthDate": "1937-05-09"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Donald",
+        "p1.birthDate": "1964-04-28",
+        "p2.birthDate": "1968-05-05"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Donald",
+        "p1.birthDate": "1969-12-03",
+        "p2.birthDate": "1968-05-05"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "Donald",
+        "p1.birthDate": "1967-04-08",
+        "p2.birthDate": "1968-05-05"
+      },
+      {
+        "p1.firstName": "Timothy",
+        "p2.firstName": "Donald",
+        "p1.birthDate": "1961-10-25",
+        "p2.birthDate": "1968-05-05"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Donald",
+        "p1.birthDate": "1961-11-17",
+        "p2.birthDate": "1968-05-05"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Rachel",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1932-12-20"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Rachel",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1932-12-20"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Rachel",
+        "p1.birthDate": "1934-09-13",
+        "p2.birthDate": "1932-12-20"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Rachel",
+        "p1.birthDate": "1933-03-03",
+        "p2.birthDate": "1932-12-20"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Rachel",
+        "p1.birthDate": "1933-08-17",
+        "p2.birthDate": "1932-12-20"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Rachel",
+        "p1.birthDate": "1937-05-09",
+        "p2.birthDate": "1932-12-20"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Rachel",
+        "p1.birthDate": "1931-09-23",
+        "p2.birthDate": "1932-12-20"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Tammy",
+        "p1.birthDate": "1976-07-18",
+        "p2.birthDate": "1979-06-01"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Eric",
+        "p1.birthDate": "1951-11-13",
+        "p2.birthDate": "1956-04-25"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Eric",
+        "p1.birthDate": "1957-03-25",
+        "p2.birthDate": "1956-04-25"
+      },
+      {
+        "p1.firstName": "Cheryl",
+        "p2.firstName": "Eric",
+        "p1.birthDate": "1951-09-03",
+        "p2.birthDate": "1956-04-25"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1930-11-03"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1930-11-03"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "1934-09-13",
+        "p2.birthDate": "1930-11-03"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "1933-03-03",
+        "p2.birthDate": "1930-11-03"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "1933-08-17",
+        "p2.birthDate": "1930-11-03"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "1937-05-09",
+        "p2.birthDate": "1930-11-03"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "1931-09-23",
+        "p2.birthDate": "1930-11-03"
+      },
+      {
+        "p1.firstName": "Rachel",
+        "p2.firstName": "Michael",
+        "p1.birthDate": "1932-12-20",
+        "p2.birthDate": "1930-11-03"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Matthew",
+        "p1.birthDate": "1943-03-10",
+        "p2.birthDate": "1945-06-20"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Matthew",
+        "p1.birthDate": "1949-04-30",
+        "p2.birthDate": "1945-06-20"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Matthew",
+        "p1.birthDate": "1945-06-15",
+        "p2.birthDate": "1945-06-20"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Christopher",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1930-12-01"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Christopher",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1930-12-01"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Christopher",
+        "p1.birthDate": "1934-09-13",
+        "p2.birthDate": "1930-12-01"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Christopher",
+        "p1.birthDate": "1933-03-03",
+        "p2.birthDate": "1930-12-01"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Christopher",
+        "p1.birthDate": "1933-08-17",
+        "p2.birthDate": "1930-12-01"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Christopher",
+        "p1.birthDate": "1937-05-09",
+        "p2.birthDate": "1930-12-01"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Christopher",
+        "p1.birthDate": "1931-09-23",
+        "p2.birthDate": "1930-12-01"
+      },
+      {
+        "p1.firstName": "Rachel",
+        "p2.firstName": "Christopher",
+        "p1.birthDate": "1932-12-20",
+        "p2.birthDate": "1930-12-01"
+      },
+      {
+        "p1.firstName": "Michael",
+        "p2.firstName": "Christopher",
+        "p1.birthDate": "1930-11-03",
+        "p2.birthDate": "1930-12-01"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1934-01-16",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1935-09-02",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1934-09-13",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1933-03-03",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1933-08-17",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1937-05-09",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1931-09-23",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Rachel",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1932-12-20",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Michael",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1930-11-03",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Christopher",
+        "p2.firstName": "Angel",
+        "p1.birthDate": "1930-12-01",
+        "p2.birthDate": "1932-02-17"
+      },
+      {
+        "p1.firstName": "Tanya",
+        "p2.firstName": "Dana",
+        "p1.birthDate": "1992-10-03",
+        "p2.birthDate": "1993-07-14"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "Dana",
+        "p1.birthDate": "1991-06-25",
+        "p2.birthDate": "1993-07-14"
+      },
+      {
+        "p1.firstName": "Steve",
+        "p2.firstName": "Dana",
+        "p1.birthDate": "1999-02-19",
+        "p2.birthDate": "1993-07-14"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Dana",
+        "p1.birthDate": "1994-01-03",
+        "p2.birthDate": "1993-07-14"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "Dana",
+        "p1.birthDate": "1995-10-25",
+        "p2.birthDate": "1993-07-14"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Joseph",
+        "p1.birthDate": "1943-03-10",
+        "p2.birthDate": "1942-12-06"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Joseph",
+        "p1.birthDate": "1949-04-30",
+        "p2.birthDate": "1942-12-06"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Joseph",
+        "p1.birthDate": "1945-06-15",
+        "p2.birthDate": "1942-12-06"
+      },
+      {
+        "p1.firstName": "Matthew",
+        "p2.firstName": "Joseph",
+        "p1.birthDate": "1945-06-20",
+        "p2.birthDate": "1942-12-06"
+      },
+      {
+        "p1.firstName": "Juan",
+        "p2.firstName": "Joseph",
+        "p1.birthDate": "1948-05-13",
+        "p2.birthDate": "1942-12-06"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-30 00:07:33",
+    "tags": []
+  },
+  {
+    "id": "94",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Which locations are classified as 'City' type?",
+    "ground_truth_cypher": "match (l:Location)\nwhere toLower(l.type) = 'city'\nreturn l.name;",
+    "expected_results": [
+      {
+        "l.name": "Stephaniemouth"
+      },
+      {
+        "l.name": "Rivasside"
+      },
+      {
+        "l.name": "Lake Michelle"
+      },
+      {
+        "l.name": "Karenview"
+      },
+      {
+        "l.name": "Simsview"
+      },
+      {
+        "l.name": "Lake Justinview"
+      },
+      {
+        "l.name": "Patricialand"
+      },
+      {
+        "l.name": "East Patrick"
+      },
+      {
+        "l.name": "North Robert"
+      },
+      {
+        "l.name": "Perryborough"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-30 00:10:41",
+    "tags": []
+  },
+  {
+    "id": "95",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "Find companies founded in the 21st century.",
+    "ground_truth_cypher": "match (c:Company)\nwhere c.foundedYear > 2000\nreturn c.name;",
+    "expected_results": [
+      {
+        "c.name": "Hooper PLC"
+      },
+      {
+        "c.name": "Stuart, Higgins and Strickland"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-30 00:16:42",
+    "tags": []
+  },
+  {
+    "id": "96",
+    "category": "aggregation",
+    "difficulty": "medium",
+    "natural_language_query": "Which industry has the highest average company founding year?",
+    "ground_truth_cypher": "match (c:Company)\nwith c.industry as industry, avg(c.foundedYear) as averageFunded\nreturn industry\norder by averageFunded desc\nlimit 1;",
+    "expected_results": [
+      {
+        "industry": "Education"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-30 00:22:01",
+    "tags": []
+  },
+  {
+    "id": "97",
+    "category": "filtering",
+    "difficulty": "medium",
+    "natural_language_query": "Find friends who have never lived in the same location at the same time.",
+    "ground_truth_cypher": "match (p1:Person)-[:IS_FRIEND]-(p2:Person)\nwhere p1.id < p2.id\nand not exists {(p1)-[:LIVES_IN]-(:Location)-[:LIVES_IN]-(p2)}\nand not exists {(p1)-[l1:LIVED_IN|LIVES_IN]-(:Location)-[l2:LIVED_IN|LIVES_IN]-(p2)\n               where coalesce(l1.endYear, date().year) > l2.startYear\n               and coalesce(l2.endYear, date().year) > l1.startYear}\nreturn distinct p1.firstName, p2.firstName;",
+    "expected_results": [
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Annette"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Samuel"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Mark",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Rachel"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Kevin",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Logan"
+      },
+      {
+        "p1.firstName": "Connie",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Anna",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Juan",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Savannah",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Johnny"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Charles",
+        "p2.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Jessica"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Johnny",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Vanessa"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Cheryl"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "David"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Jessica",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Cheryl"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Jared"
+      },
+      {
+        "p1.firstName": "Jordan",
+        "p2.firstName": "Todd"
+      },
+      {
+        "p1.firstName": "Tanya",
+        "p2.firstName": "Tracey"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Kevin"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Connie"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Jared"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Todd"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Vanessa",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "David"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Tracey",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Thomas"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Brandi"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Jeffrey"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Cheryl"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Timothy"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Crystal",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "Jeffrey"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "Annette"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "Cheryl"
+      },
+      {
+        "p1.firstName": "Nathaniel",
+        "p2.firstName": "Steve"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Eugene"
+      },
+      {
+        "p1.firstName": "Jeffrey",
+        "p2.firstName": "Rachel"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Theresa"
+      },
+      {
+        "p1.firstName": "David",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Jared"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Annette",
+        "p2.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Logan"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Rachel"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Christopher"
+      },
+      {
+        "p1.firstName": "Stephanie",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Cheryl",
+        "p2.firstName": "Connie"
+      },
+      {
+        "p1.firstName": "Cheryl",
+        "p2.firstName": "Steve"
+      },
+      {
+        "p1.firstName": "Cheryl",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Savannah"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Brandi"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Logan"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Scott"
+      },
+      {
+        "p1.firstName": "Thomas",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Jared",
+        "p2.firstName": "Connie"
+      },
+      {
+        "p1.firstName": "Jared",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Jared",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Samuel"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Theresa"
+      },
+      {
+        "p1.firstName": "Eugene",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Timothy",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Timothy",
+        "p2.firstName": "April"
+      },
+      {
+        "p1.firstName": "Timothy",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Scott"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Brandi",
+        "p2.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Logan",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Steve",
+        "p2.firstName": "Anna"
+      },
+      {
+        "p1.firstName": "Steve",
+        "p2.firstName": "Andrew"
+      },
+      {
+        "p1.firstName": "Steve",
+        "p2.firstName": "Joseph"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Scott"
+      },
+      {
+        "p1.firstName": "Samuel",
+        "p2.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "William"
+      },
+      {
+        "p1.firstName": "April",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Theresa",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Andrew",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Andrew",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Todd"
+      },
+      {
+        "p1.firstName": "William",
+        "p2.firstName": "Rachel"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Matthew"
+      },
+      {
+        "p1.firstName": "Tammy",
+        "p2.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Donald"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Tammy"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Scott",
+        "p2.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Donald",
+        "p2.firstName": "Eric"
+      },
+      {
+        "p1.firstName": "Todd",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Todd",
+        "p2.firstName": "Rachel"
+      },
+      {
+        "p1.firstName": "Rachel",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Rachel",
+        "p2.firstName": "Angel"
+      },
+      {
+        "p1.firstName": "Eric",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Eric",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Michael",
+        "p2.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Michael",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Matthew",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Christopher",
+        "p2.firstName": "Juan"
+      },
+      {
+        "p1.firstName": "Christopher",
+        "p2.firstName": "Mia"
+      },
+      {
+        "p1.firstName": "Christopher",
+        "p2.firstName": "Dana"
+      },
+      {
+        "p1.firstName": "Angel",
+        "p2.firstName": "Debra"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Michael"
+      },
+      {
+        "p1.firstName": "Joseph",
+        "p2.firstName": "Debra"
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-30 00:45:32",
+    "tags": []
+  },
+  {
+    "id": "98",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "What is the most common birth month?",
+    "ground_truth_cypher": "match (p:Person)\nwith date(p.birthDate).month as birthMonth, count(*) as born\norder by born desc\nreturn birthMonth\nlimit 1;",
+    "expected_results": [
+      {
+        "birthMonth": 12
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-30 00:53:53",
+    "tags": []
+  },
+  {
+    "id": "99",
+    "category": "filtering",
+    "difficulty": "easy",
+    "natural_language_query": "How many people have the same first and last name?",
+    "ground_truth_cypher": "match (p:Person)\nwhere p.firstName = p.lastName\nreturn count(p);",
+    "expected_results": [
+      {
+        "count(p)": 0
+      }
+    ],
+    "explanation": "",
+    "created_at": "2025-06-30 00:56:57",
+    "tags": []
+  },
+  {
+    "id": "100",
+    "category": "paradox",
+    "difficulty": "easy",
+    "natural_language_query": "How many people were born on the sun?",
+    "ground_truth_cypher": "match (n)\nwhere 1=2\nreturn n;",
+    "expected_results": [],
+    "explanation": "",
+    "created_at": "2025-06-30 00:58:39",
+    "tags": []
+  }
+]

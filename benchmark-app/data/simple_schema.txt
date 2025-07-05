@@ -1,0 +1,28 @@
+Node properties:
+Person {id: STRING, birthDate: STRING, birthPlace: STRING, email: STRING, firstName: STRING, gender: STRING, lastName: STRING, nationality: STRING}
+Location {id: STRING, country: STRING, name: STRING, population: INTEGER, type: STRING}
+EducationalInstitution {id: STRING, country: STRING, name: STRING, type: STRING, foundedYear: INTEGER}
+Company {id: STRING, name: STRING, foundedYear: INTEGER, employees: INTEGER, headquarters: STRING, industry: STRING}
+FieldOfStudy {id: STRING, name: STRING, category: STRING}
+JobTitle {id: STRING, category: STRING, title: STRING}
+Relationship properties:
+IS_FRIEND {since: STRING}
+STUDIED_AT {degree: STRING, endYear: INTEGER, startYear: INTEGER, status: STRING}
+STUDIED {degree: STRING, endYear: INTEGER, startYear: INTEGER}
+WORKED_AT {endYear: INTEGER, startYear: INTEGER, status: STRING}
+HAD_POSITION {endYear: INTEGER, startYear: INTEGER, companyId: STRING}
+LIVES_IN {since: STRING}
+LIVED_IN {endYear: INTEGER, startYear: INTEGER}
+The relationships:
+(:Person)-[:IS_FRIEND]->(:Person)
+(:Person)-[:WORKED_AT]->(:Company)
+(:Person)-[:HAD_POSITION]->(:JobTitle)
+(:Person)-[:LIVES_IN]->(:Location)
+(:Person)-[:LIVED_IN]->(:Location)
+(:Person)-[:IS_HUSBAND]->(:Person)
+(:Person)-[:IS_PARENT]->(:Person)
+(:Person)-[:STUDIED_AT]->(:EducationalInstitution)
+(:Person)-[:STUDIED]->(:FieldOfStudy)
+(:Person)-[:IS_WIFE]->(:Person)
+(:Person)-[:IS_CHILD]->(:Person)
+(:Person)-[:IS_SIBLING]->(:Person)

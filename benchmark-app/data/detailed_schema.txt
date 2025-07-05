@@ -1,0 +1,83 @@
+### Nodes:
+- Person: {
+    id: string (Format: p<integer>)
+    firstName: string (Common English male/female first names)
+    lastName: string (Common English last names)
+    gender: string (['Male', 'Female'])
+    birthDate: string (YYYY-MM-DD, Range: 1920-2005)
+    birthPlace: string (Real-world city names)
+    email: string (Standard email address format, e.g., user@example.com)
+    nationality: string (['American', 'British', 'Canadian', 'Australian', 'German', 'French'])
+}
+- Location: {
+    id: string (Format: loc<integer>)
+    name: string (Real-world city names)
+    type: string (Fixed: 'City')
+    country: string (Real-world country names)
+    population: integer (Range: 5,000 - 15,000,000)
+}
+- **EducationalInstitution**: {
+    id: string (Format: edu<integer>)
+    name: string (Format: <city> <University|College|Institute>)
+    type: string (['University', 'College', 'Institute'])
+    foundedYear: integer (Range: 1500 - 2000)
+    country: string (Real-world country names)
+}
+- **Company**: {
+    id: string (Format: comp<integer>)
+    name: string (Realistic company names)
+    industry: string (['Technology', 'Finance', 'Healthcare', 'Education', 'Manufacturing', 'Retail'])
+    foundedYear: integer (Range: 1800 - 2020)
+    headquarters: string (Format: <city>, <state/province abbreviation>)
+    employees: integer (Range: 10 - 500,000)
+}
+- **FieldOfStudy**: {
+    id: string (Format: field<integer>)
+    name: string (['Computer Science', 'Business Administration', 'Medicine', 'Law', 'Engineering', 'Physics', 'Mathematics', 'Literature', 'History', 'Chemistry', 'Biology', 'Psychology', 'Sociology', 'Philosophy', 'Economics'])
+    category: string (['Science', 'Engineering', 'Arts', 'Humanities', 'Business'])
+}
+- **JobTitle**: {
+    id: string (Format: job<integer>)
+    title: string (['Software Engineer', 'Data Scientist', 'Manager', 'Director', 'CEO', 'CTO', 'CFO', 'Doctor', 'Lawyer', 'Teacher', 'Professor', 'Researcher', 'Designer', 'Artist', 'Writer', 'Accountant', 'Analyst', 'Consultant', 'Marketing Specialist', 'HR Manager', 'Product Manager', 'Sales Representative', 'Customer Support', 'Project Manager', 'Architect'])
+    category: string (['Technology', 'Management', 'Healthcare', 'Education', 'Finance', 'Arts'])
+}
+
+### Relationships:
+- **(:Person)-[IS_HUSBAND]->(:Person)**: No properties.
+- **(:Person)-[IS_WIFE]->(:Person)**: No properties.
+- **(:Person)-[IS_PARENT]->(:Person)**: No properties.
+- **(:Person)-[IS_CHILD]->(:Person)**: No properties.
+- (:Person)-[IS_SIBLING]-(:Person): No properties.
+
+- (:Person)-[IS_FRIEND]-(:Person): {
+    since: string (YYYY-MM-DD, Range: 2010-2023)
+}
+
+- (:Person)-[STUDIED_AT]->(:EducationalInstitution): {
+    startYear: integer (Range: Person's birth year + 18 to 20 + offset)
+    endYear: integer/null (Range: startYear + 2/4/5 years or null for 'Current' status)
+    degree: string (['Bachelor', 'Master', 'PhD'])
+    status: string (['Current', 'Graduated'])
+}
+- (:Person)-[STUDIED]->(:FieldOfStudy): {
+    startYear: integer (Range: Person's birth year + 18 to 20 + offset)
+    endYear: integer/null (Range: startYear + 2/4/5 years or null for 'Current' status)
+    degree: string (['Bachelor', 'Master', 'PhD'])
+}
+- **(:Person)-[WORKED_AT]->(:Company)**: {
+    startYear: integer (Range: Person's birth year + 18 to 25)
+    endYear: integer/null (Range: startYear + 2-5 years or null for 'Current' status)
+    status: string (['Current', 'Former'])
+}
+- **(:Person)-[HAD_POSITION]->(:JobTitle)**: {
+    startYear: integer (Range: Person's birth year + 18 to 25)
+    endYear: integer/null (Range: startYear + 2-5 years or null for 'Current' status)
+    companyId: string (Refers to Company.id)
+}
+- **(:Person)-[LIVES_IN]->(:Location)**: {
+    since: string (YYYY-MM-DD, Range: 2000-2023)
+}
+- **(:Person)-[LIVED_IN]->(:Location)**: {
+    startYear: integer (Range: Person's birth year + 18 to 2020)
+    endYear: integer (Range: startYear + 1 to 2022)
+}
